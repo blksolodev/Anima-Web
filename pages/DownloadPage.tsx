@@ -4,7 +4,7 @@ import { GlassCard } from '../components/GlassCard';
 import { Button } from '../components/Button';
 import { STATS } from '../constants';
 import { Link } from 'react-router-dom';
-import { Smartphone, Monitor, ChevronRight, Star, Download, CheckCircle2 } from 'lucide-react';
+import { Smartphone, Monitor, ChevronRight, Star, Download, Sparkles } from 'lucide-react';
 
 const steps = [
   { n: '01', title: 'Create your account', desc: 'Sign up with email or Google in under a minute.' },
@@ -40,11 +40,11 @@ export const DownloadPage: React.FC = () => {
               <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 tracking-tight">
                 Download Anima.<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-                  Watch together.
+                  Your anime social hub.
                 </span>
               </h1>
               <p className="text-xl text-[#A0A0B0] mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Free on all platforms. Track what you're watching, share your reactions,
+                Track what you're watching, share your reactions,
                 and connect with fans in real-time episode discussions.
               </p>
 
@@ -155,39 +155,64 @@ export const DownloadPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Free + features */}
+      {/* Tier CTA */}
       <section className="py-24">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <GlassCard className="text-center py-16 px-8 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B35]/10 to-[#4ECDC4]/5 pointer-events-none" />
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Free tier */}
+            <GlassCard className="flex flex-col justify-between py-10 px-8">
+              <div>
+                <h3 className="text-white font-bold text-xl mb-2">Free</h3>
+                <p className="text-[#A0A0B0] text-sm leading-relaxed mb-6">
+                  Everything you need to track anime, post reactions, and join episode discussions — at no cost.
+                </p>
+                <ul className="space-y-2 mb-8">
+                  {['Social feed', 'Anime library', 'Episode & live discussions', 'Discover'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-[#A0A0B0]">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Button variant="ghost" className="w-full">
+                <Download size={16} />
+                Download
+              </Button>
+            </GlassCard>
+
+            {/* Paid tier */}
+            <GlassCard className="flex flex-col justify-between py-10 px-8 relative overflow-hidden border-[#FF6B35]/30">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B35]/10 to-transparent pointer-events-none" />
               <div className="relative z-10">
-                <div className="flex justify-center mb-6">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00D26A]/10 border border-[#00D26A]/20 text-[#00D26A] text-sm font-semibold">
-                    <CheckCircle2 size={16} />
-                    Always free
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-white font-bold text-xl">Anima+</h3>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF6B35]/15 border border-[#FF6B35]/30 text-[#FF6B35] text-xs font-semibold">
+                    <Sparkles size={12} />
+                    Premium
                   </div>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Everything included. No paywall.
-                </h2>
-                <p className="text-[#A0A0B0] max-w-lg mx-auto mb-8 leading-relaxed">
-                  Every feature — social feed, discussions, anime library, discover — is free on every platform.
-                  No premium tier, no feature gating.
+                <p className="text-[#A0A0B0] text-sm leading-relaxed mb-6">
+                  Support the platform and stand out with exclusive perks that show off your status in the community.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button>
-                    <Download size={18} />
-                    Download Free
-                  </Button>
-                  <Link to="/features">
-                    <Button variant="ghost" icon={<ChevronRight size={16} />}>
-                      Explore Features
-                    </Button>
-                  </Link>
-                </div>
+                <ul className="space-y-2 mb-8">
+                  {['Exclusive profile badges', 'Custom aura colors', 'Early access to new features', 'Priority support', 'Everything in Free'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-[#A0A0B0]">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="relative z-10">
+                <Button className="w-full">
+                  <Sparkles size={16} />
+                  Get Anima+
+                </Button>
               </div>
             </GlassCard>
+
           </div>
         </div>
       </section>
