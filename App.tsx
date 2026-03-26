@@ -91,6 +91,21 @@ const App: React.FC = () => {
     <Router>
       <ScrollToTop />
       <Routes>
+        {/* Public Marketing — must be before the protected "/" parent */}
+        <Route path="/download" element={<MarketingLayout><DownloadPage /></MarketingLayout>} />
+        <Route path="/features" element={<MarketingLayout><FeaturesPage /></MarketingLayout>} />
+        <Route path="/about" element={<MarketingLayout><AboutPage /></MarketingLayout>} />
+        <Route path="/privacy" element={<MarketingLayout><PrivacyPolicy /></MarketingLayout>} />
+        <Route path="/terms" element={<MarketingLayout><TermsOfService /></MarketingLayout>} />
+        <Route path="/guidelines" element={<MarketingLayout><CommunityGuidelines /></MarketingLayout>} />
+
+        {/* Auth */}
+        <Route path="/login" element={<div className="text-white scanlines"><Login /></div>} />
+        <Route path="/register" element={<div className="text-white scanlines"><Register /></div>} />
+
+        {/* Onboarding */}
+        <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
+
         {/* Protected App Shell */}
         <Route
           path="/"
@@ -110,26 +125,10 @@ const App: React.FC = () => {
           <Route path="notifications" element={<Notifications />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings/*" element={<Settings />} />
-          {/* Deep-link routes */}
           <Route path="post/:postId" element={<PostDetail />} />
           <Route path="user/:userId" element={<UserProfile />} />
           <Route path="anime/:animeId" element={<AnimeDetail />} />
         </Route>
-
-        {/* Marketing */}
-        <Route path="/download" element={<MarketingLayout><DownloadPage /></MarketingLayout>} />
-        <Route path="/features" element={<MarketingLayout><FeaturesPage /></MarketingLayout>} />
-        <Route path="/about" element={<MarketingLayout><AboutPage /></MarketingLayout>} />
-        <Route path="/privacy" element={<MarketingLayout><PrivacyPolicy /></MarketingLayout>} />
-        <Route path="/terms" element={<MarketingLayout><TermsOfService /></MarketingLayout>} />
-        <Route path="/guidelines" element={<MarketingLayout><CommunityGuidelines /></MarketingLayout>} />
-
-        {/* Auth */}
-        <Route path="/login" element={<div className="text-white scanlines"><Login /></div>} />
-        <Route path="/register" element={<div className="text-white scanlines"><Register /></div>} />
-
-        {/* Onboarding */}
-        <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
