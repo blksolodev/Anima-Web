@@ -22,6 +22,9 @@ import { UserProfile } from './pages/app/UserProfile';
 import { AnimeDetail } from './pages/app/AnimeDetail';
 
 import { Onboarding } from './pages/Onboarding';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
+import { CommunityGuidelines } from './pages/CommunityGuidelines';
 import { useAuthStore } from './store/useAuthStore';
 import { Loader2 } from 'lucide-react';
 
@@ -117,6 +120,9 @@ const App: React.FC = () => {
         <Route path="/download" element={<MarketingLayout><DownloadPage /></MarketingLayout>} />
         <Route path="/features" element={<MarketingLayout><FeaturesPage /></MarketingLayout>} />
         <Route path="/about" element={<MarketingLayout><AboutPage /></MarketingLayout>} />
+        <Route path="/privacy" element={<MarketingLayout><PrivacyPolicy /></MarketingLayout>} />
+        <Route path="/terms" element={<MarketingLayout><TermsOfService /></MarketingLayout>} />
+        <Route path="/guidelines" element={<MarketingLayout><CommunityGuidelines /></MarketingLayout>} />
 
         {/* Auth */}
         <Route path="/login" element={<div className="text-white scanlines"><Login /></div>} />

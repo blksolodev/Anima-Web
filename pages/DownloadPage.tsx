@@ -1,65 +1,83 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
-import { Smartphone, QrCode, ChevronRight, Star, Zap } from 'lucide-react';
 import { Button } from '../components/Button';
-import { FEATURES, STATS } from '../constants';
+import { STATS } from '../constants';
 import { Link } from 'react-router-dom';
+import { Smartphone, Monitor, ChevronRight, Star, Download, CheckCircle2 } from 'lucide-react';
+
+const steps = [
+  { n: '01', title: 'Create your account', desc: 'Sign up with email or Google in under a minute.' },
+  { n: '02', title: 'Build your library', desc: 'Search any anime and add it to your watchlist instantly.' },
+  { n: '03', title: 'Join the conversation', desc: 'Post reactions, join episode discussions, and find your people.' },
+];
 
 export const DownloadPage: React.FC = () => {
   return (
     <div className="overflow-hidden">
-      {/* Hero / Download Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20">
-        {/* Background Decorative Circles */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-[#FF6B35] opacity-[0.08] blur-[100px]" />
-        <div className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] rounded-full bg-[#4ECDC4] opacity-[0.06] blur-[120px]" />
+
+      {/* Hero */}
+      <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16">
+        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] rounded-full bg-[#FF6B35] opacity-[0.07] blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] rounded-full bg-[#4ECDC4] opacity-[0.05] blur-[140px] pointer-events-none" />
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
-            
-            {/* Left Content */}
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
+
+            {/* Left */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
               className="flex-1 text-center lg:text-left"
             >
-               <div className="flex justify-center lg:justify-start mb-6">
+              <div className="flex justify-center lg:justify-start mb-6">
                 <span className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium text-[#FF6B35] backdrop-blur-md">
-                  v2.0 is now live on iOS & Android
+                  Available now — iOS, Android & Web
                 </span>
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6 tracking-tight">
-                Your anime <br />
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6 tracking-tight">
+                Download Anima.<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-                  social universe
+                  Watch together.
                 </span>
               </h1>
-              <p className="text-xl text-[#A0A0B0] mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Join guilds, track your watchlist, and connect with fellow anime fans in an 
-                immersive RPG-inspired social network.
+              <p className="text-xl text-[#A0A0B0] mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Free on all platforms. Track what you're watching, share your reactions,
+                and connect with fans in real-time episode discussions.
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
                 <Button className="w-full sm:w-auto">
+                  <Smartphone size={18} />
                   <span className="flex flex-col items-start leading-none">
-                    <span className="text-xs opacity-70 mb-1">Download on the</span>
-                    <span className="font-bold text-lg">App Store</span>
+                    <span className="text-xs opacity-70 mb-0.5">Download on the</span>
+                    <span className="font-bold">App Store</span>
                   </span>
                 </Button>
                 <Button variant="ghost" className="w-full sm:w-auto">
+                  <Smartphone size={18} />
                   <span className="flex flex-col items-start leading-none">
-                    <span className="text-xs opacity-70 mb-1">Get it on</span>
-                    <span className="font-bold text-lg">Google Play</span>
+                    <span className="text-xs opacity-70 mb-0.5">Get it on</span>
+                    <span className="font-bold">Google Play</span>
                   </span>
                 </Button>
+                <Link to="/login">
+                  <Button variant="ghost" className="w-full sm:w-auto">
+                    <Monitor size={18} />
+                    <span className="flex flex-col items-start leading-none">
+                      <span className="text-xs opacity-70 mb-0.5">Open in</span>
+                      <span className="font-bold">Browser</span>
+                    </span>
+                  </Button>
+                </Link>
               </div>
 
-               {/* Stats Row */}
-              <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-8">
-                {STATS.map((stat, index) => (
-                  <div key={index}>
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-white/10">
+                {STATS.map((stat, i) => (
+                  <div key={i}>
                     <h3 className="text-2xl font-bold text-white mb-1">{stat.value}</h3>
                     <p className="text-xs text-[#6B6B7B] uppercase tracking-wider">{stat.label}</p>
                   </div>
@@ -67,102 +85,113 @@ export const DownloadPage: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Right Visual (QR Code) */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex-1 flex justify-center relative"
+            {/* Right — platform cards */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="flex-1 w-full max-w-sm mx-auto lg:max-w-full"
             >
-               {/* Floating Badges */}
-               <motion.div 
-                animate={{ y: [0, -20, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-10 -right-4 z-20 hidden md:block"
-              >
-                 <GlassCard className="!p-3 flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center">
-                      <Star size={14} className="text-white fill-current" />
-                   </div>
-                   <div>
-                     <p className="text-xs font-bold">New Achievement</p>
-                     <p className="text-[10px] text-gray-400">Level 5 Otaku</p>
-                   </div>
-                 </GlassCard>
-              </motion.div>
-
-              <GlassCard className="p-8 md:p-12 text-center max-w-sm w-full relative z-10 bg-black/40">
-                <div className="mb-8 relative">
-                  <div className="absolute inset-0 bg-[#FF6B35] blur-[40px] opacity-20" />
-                  <div className="relative bg-white p-4 rounded-xl">
-                    {/* Mock QR Code */}
-                     <div className="w-full aspect-square bg-gray-900 rounded flex items-center justify-center overflow-hidden">
-                        <div className="grid grid-cols-6 grid-rows-6 gap-1 w-full h-full p-2">
-                          {Array.from({ length: 36 }).map((_, i) => (
-                             <div 
-                                key={i} 
-                                className={`bg-black rounded-sm ${Math.random() > 0.5 ? 'opacity-100' : 'opacity-0'}`} 
-                             />
-                          ))}
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                           <QrCode size={48} className="text-white bg-black p-2 rounded-lg" />
-                        </div>
-                     </div>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-2">Scan to Download</h3>
-                <p className="text-sm text-[#A0A0B0]">
-                  Use your camera to instantly jump into the store.
-                </p>
-              </GlassCard>
+              <div className="space-y-4">
+                {[
+                  { platform: 'iOS', store: 'App Store', badge: '4.9 ★', sub: 'iPhone & iPad', icon: Smartphone },
+                  { platform: 'Android', store: 'Google Play', badge: '4.8 ★', sub: 'All Android devices', icon: Smartphone },
+                  { platform: 'Web App', store: 'No install needed', badge: 'Free', sub: 'Any modern browser', icon: Monitor },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + i * 0.1 }}
+                  >
+                    <GlassCard hoverEffect className="flex items-center gap-5 !p-5">
+                      <div className="w-12 h-12 rounded-2xl bg-[#FF6B35]/10 flex items-center justify-center text-[#FF6B35] flex-shrink-0">
+                        <item.icon size={22} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-semibold">{item.platform}</p>
+                        <p className="text-[#A0A0B0] text-sm">{item.sub}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-[#FF6B35] font-bold text-sm">{item.badge}</p>
+                        <p className="text-[#6B6B7B] text-xs">{item.store}</p>
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
 
           </div>
         </div>
       </section>
 
-      {/* Features Preview */}
+      {/* How it works */}
       <section className="py-24 border-t border-white/5 bg-white/[0.02]">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Level up your fandom</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Up and running in minutes</h2>
             <p className="text-[#A0A0B0] max-w-xl mx-auto">
-              More than just a tracking list. Anima gamifies your watching experience.
+              No tutorials, no complicated setup. Anima is built to feel intuitive from the first tap.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {FEATURES.map((feature, index) => (
-              <GlassCard 
-                key={feature.id}
-                hoverEffect
-                className="group"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {steps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
               >
-                <div className="flex items-start gap-4">
-                  <div 
-                    className="p-3 rounded-xl bg-white/5 text-[#FF6B35] group-hover:text-white group-hover:bg-[#FF6B35] transition-colors"
-                  >
-                    <feature.icon size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-[#A0A0B0] leading-relaxed mb-4">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
+                <GlassCard className="text-center h-full">
+                  <div className="text-4xl font-bold text-white/10 mb-4 font-mono">{step.n}</div>
+                  <h3 className="text-white font-bold text-lg mb-2">{step.title}</h3>
+                  <p className="text-[#A0A0B0] text-sm leading-relaxed">{step.desc}</p>
+                </GlassCard>
+              </motion.div>
             ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Link to="/features">
-              <Button variant="ghost">View All Features</Button>
-            </Link>
           </div>
         </div>
       </section>
+
+      {/* Free + features */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto">
+            <GlassCard className="text-center py-16 px-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#FF6B35]/10 to-[#4ECDC4]/5 pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex justify-center mb-6">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#00D26A]/10 border border-[#00D26A]/20 text-[#00D26A] text-sm font-semibold">
+                    <CheckCircle2 size={16} />
+                    Always free
+                  </div>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                  Everything included. No paywall.
+                </h2>
+                <p className="text-[#A0A0B0] max-w-lg mx-auto mb-8 leading-relaxed">
+                  Every feature — social feed, discussions, anime library, discover — is free on every platform.
+                  No premium tier, no feature gating.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button>
+                    <Download size={18} />
+                    Download Free
+                  </Button>
+                  <Link to="/features">
+                    <Button variant="ghost" icon={<ChevronRight size={16} />}>
+                      Explore Features
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 };

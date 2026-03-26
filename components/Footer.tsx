@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { COLORS } from '../constants';
 import { Twitter, Instagram, Github } from 'lucide-react';
 
+
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#0D0D14] border-t border-white/10 pt-16 pb-8">
@@ -21,7 +22,7 @@ export const Footer: React.FC = () => {
               />
             </Link>
             <p className="text-[#A0A0B0] max-w-xs mb-6">
-              The social universe built for anime fans. Join the guild, level up, and connect.
+              The social platform built for anime fans. Track, discuss, and connect with people who get it.
             </p>
             <div className="flex gap-4">
               {[Twitter, Instagram, Github].map((Icon, idx) => (
@@ -45,9 +46,9 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-[#A0A0B0] hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-[#A0A0B0] hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-[#A0A0B0] hover:text-white transition-colors">Community Guidelines</a></li>
+              <li><Link to="/privacy" className="text-[#A0A0B0] hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="text-[#A0A0B0] hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link to="/guidelines" className="text-[#A0A0B0] hover:text-white transition-colors">Community Guidelines</Link></li>
             </ul>
           </div>
         </div>
