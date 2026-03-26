@@ -15,6 +15,7 @@ const highlights = [
     desc: 'Start or join real-time discussion rooms the moment an episode drops. React, theorize, and experience the episode together.',
     accent: '#FF6B35',
     tag: 'Fan favorite',
+    image: '/socialfeed.png',
   },
   {
     icon: MessagesSquare,
@@ -22,13 +23,15 @@ const highlights = [
     desc: 'Every episode gets its own spoiler-safe discussion thread. Dive into post-episode breakdowns without ruining anything for others.',
     accent: '#4ECDC4',
     tag: 'Core feature',
+    image: '/socialfeed.png',
   },
   {
     icon: Tv,
     title: 'Anime Library',
-    desc: 'Track everything you're watching, have watched, or plan to watch. Rate shows, log episodes, and see your stats grow.',
+    desc: 'Track everything you\'re watching, have watched, or plan to watch. Rate shows, log episodes, and see your stats grow.',
     accent: '#FF6B35',
     tag: 'Tracker',
+    image: '/library.png',
   },
   {
     icon: Users,
@@ -36,6 +39,7 @@ const highlights = [
     desc: 'Post reactions, share opinions, and see what the community is talking about. A timeline built entirely for anime fans.',
     accent: '#4ECDC4',
     tag: 'Social',
+    image: '/socialfeed.png',
   },
   {
     icon: Search,
@@ -43,6 +47,7 @@ const highlights = [
     desc: 'Find new shows through community picks, trending titles, and genre-based browsing — all surfaced by real fans.',
     accent: '#FF6B35',
     tag: 'Discovery',
+    image: '/explore.png',
   },
   {
     icon: Bell,
@@ -50,6 +55,7 @@ const highlights = [
     desc: 'Get notified when someone replies to your discussion, reacts to your post, or starts a live discussion thread you care about.',
     accent: '#4ECDC4',
     tag: 'Alerts',
+    image: null,
   },
 ];
 
@@ -120,6 +126,15 @@ export const FeaturesPage: React.FC = () => {
                   </div>
                   <h3 className="text-white font-bold text-xl mb-3">{f.title}</h3>
                   <p className="text-[#A0A0B0] leading-relaxed text-sm">{f.desc}</p>
+                  {f.image && (
+                    <div className="mt-5 flex justify-center">
+                      <img
+                        src={f.image}
+                        alt={f.title}
+                        className="w-[65%] rounded-2xl object-contain group-hover:scale-[1.02] transition-transform duration-500"
+                      />
+                    </div>
+                  )}
                 </GlassCard>
               </motion.div>
             ))}
