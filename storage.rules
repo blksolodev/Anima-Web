@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Anyone authenticated can read all files
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // Avatars - users can only write to their own folder
+    match /avatars/{userId}/{fileName} {
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+        request.resource.contentType.matches('image/.*');
+    }
+    
+    // Banners - users can only write to their own folder
+    match /banners/{userId}/{fileName} {
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 10 * 1024 * 1024 && // Max 10MB
+        request.resource.contentType.matches('image/.*');
+    }
+    
+    // Post media - users can only write to their own folders
+    match /posts/{userId}/{postId}/{fileName} {
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 50 * 1024 * 1024; // Max 50MB for videos
+    }
+  }
+}
