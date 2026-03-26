@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { GlassCard } from '../components/GlassCard';
 import { FEATURES, COLORS } from '../constants';
-import { Play } from 'lucide-react';
 
 export const FeaturesPage: React.FC = () => {
   return (
@@ -58,28 +57,12 @@ export const FeaturesPage: React.FC = () => {
 
                 {/* Visual Content */}
                 <div className="flex-1 w-full max-w-md lg:max-w-full">
-                  <GlassCard className="relative aspect-[4/3] flex items-center justify-center p-0 !overflow-hidden group">
-                    <img 
-                      src={feature.image} 
+                  <GlassCard className="p-0 !overflow-hidden group">
+                    <img
+                      src={feature.image}
                       alt={feature.title}
-                      className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D14] via-transparent to-transparent opacity-90" />
-                    
-                    {/* Floating UI Mockup */}
-                    <div className="relative z-10 w-3/4 p-4 bg-[#1A1A2E]/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl transform group-hover:-translate-y-2 transition-transform duration-500">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-full bg-white/10" />
-                        <div className="h-2 w-24 bg-white/10 rounded-full" />
-                      </div>
-                      <div className="h-24 bg-white/5 rounded-xl mb-3 flex items-center justify-center">
-                        <Play className="text-white/20 fill-current" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-2 w-full bg-white/10 rounded-full" />
-                        <div className="h-2 w-2/3 bg-white/10 rounded-full" />
-                      </div>
-                    </div>
                   </GlassCard>
                 </div>
               </motion.div>

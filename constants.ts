@@ -38,28 +38,28 @@ export const FEATURES: FeatureItem[] = [
     title: "Social Feed",
     description: "Post your thoughts, share episode reactions, and connect with other fans in real time.",
     icon: MessagesSquare,
-    image: "https://picsum.photos/id/122/800/600"
+    image: "/socialfeed.png"
   },
   {
     id: "discussions",
     title: "Episode Discussions",
     description: "Jump into episode-specific threads and share your reactions the moment an episode drops.",
     icon: Swords,
-    image: "https://picsum.photos/id/133/800/600"
+    image: "/socialfeed.png"
   },
   {
     id: "library",
     title: "Anime Library",
     description: "Track what you're watching, what you've finished, and get recommendations tailored to your taste.",
     icon: Tv,
-    image: "https://picsum.photos/id/234/800/600"
+    image: "/library.png"
   },
   {
     id: "discover",
     title: "Discover",
     description: "Find new shows, trending titles, and hidden gems surfaced by the community — not just an algorithm.",
     icon: Trophy,
-    image: "https://picsum.photos/id/452/800/600"
+    image: "/explore.png"
   }
 ];
 
