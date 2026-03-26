@@ -35,8 +35,7 @@ export const Home: React.FC = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-[#A0A0B0] max-w-2xl mx-auto mb-10 leading-relaxed">
-              Join guilds, track your watchlist, and connect with fellow anime fans in an 
-              immersive RPG-inspired social network.
+              Track what you're watching, share your reactions, and connect with anime fans who actually get it.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -66,8 +65,8 @@ export const Home: React.FC = () => {
                     <Star size={18} className="text-white fill-current" />
                  </div>
                  <div>
-                   <p className="text-sm font-bold">New Achievement</p>
-                   <p className="text-xs text-gray-400">Level 5 Otaku Reached</p>
+                   <p className="text-sm font-bold">Now Watching</p>
+                   <p className="text-xs text-gray-400">Frieren — Ep. 16</p>
                  </div>
                </div>
              </GlassCard>
@@ -85,8 +84,8 @@ export const Home: React.FC = () => {
                     <Zap size={18} className="text-white fill-current" />
                  </div>
                  <div>
-                   <p className="text-sm font-bold">Arena Victory</p>
-                   <p className="text-xs text-gray-400">+150 Reputation Earned</p>
+                   <p className="text-sm font-bold">Trending Discussion</p>
+                   <p className="text-xs text-gray-400">#SoloLeveling · 42K posts</p>
                  </div>
                </div>
              </GlassCard>
@@ -112,9 +111,9 @@ export const Home: React.FC = () => {
       <section className="py-24 relative">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Level up your fandom</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Everything you need as an anime fan</h2>
             <p className="text-[#A0A0B0] max-w-xl mx-auto">
-              More than just a tracking list. Anima gamifies your watching experience.
+              More than a tracking app — Anima is where the conversation happens.
             </p>
           </div>
 
@@ -159,9 +158,9 @@ export const Home: React.FC = () => {
           <GlassCard className="text-center py-16 px-6 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] to-[#FF8A50] opacity-10" />
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to start your journey?</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">Join the community</h2>
               <p className="text-[#A0A0B0] mb-8 max-w-lg mx-auto">
-                Join thousands of anime fans who have already found their guild. 
+                Thousands of anime fans are already tracking, discussing, and discovering together.
                 Available for free on iOS and Android.
               </p>
               <Link to="/download">

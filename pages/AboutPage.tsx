@@ -18,16 +18,16 @@ export const AboutPage: React.FC = () => {
           >
             Built by fans, for fans.
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="text-xl text-[#A0A0B0] leading-relaxed"
           >
-            Anima was born from a simple frustration: discussion threads were scattered, 
-            lists were boring, and watching anime felt like a solitary experience. 
-            We set out to create a universe where your fandom has real value, 
-            connecting you with your guild in a world that rewards your passion.
+            Anima was born from a simple frustration: discussion threads were scattered,
+            tracking apps were lifeless, and watching anime felt like a solo activity.
+            We built the platform we always wanted — one place to track, discuss, and
+            share your love of anime with people who feel the same way.
           </motion.p>
         </div>
 
@@ -50,7 +50,7 @@ export const AboutPage: React.FC = () => {
 
         {/* Team */}
         <div>
-          <h2 className="text-3xl font-bold mb-12 text-center">Meet the Party</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center">Meet the Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {TEAM.map((member, index) => (
               <GlassCard key={index} hoverEffect className="text-center group">

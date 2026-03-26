@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { NAV_LINKS, COLORS } from '../constants';
 import { Button } from './Button';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,8 +31,8 @@ export const Navbar: React.FC = () => {
       }`}
     >
       <div className="container mx-auto px-6 flex justify-between items-center">
-        {/* Logo - Points to marketing home */}
-        <Link to="/download" className="flex items-center gap-1 group" onClick={closeMenu}>
+        {/* Logo - Points to app home if signed in, login if not */}
+        <Link to={user ? "/" : "/login"} className="flex items-center gap-1 group" onClick={closeMenu}>
           <span className="text-2xl font-bold tracking-tight text-white group-hover:text-white/90 transition-colors">
             anima
           </span>

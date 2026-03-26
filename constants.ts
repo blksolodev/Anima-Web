@@ -34,30 +34,30 @@ export const APP_NAV_LINKS: NavLink[] = [
 
 export const FEATURES: FeatureItem[] = [
   {
-    id: "guilds",
-    title: "Guild Chats",
-    description: "Join episode-specific discussion rooms and form permanent guilds with fans who share your taste.",
+    id: "social",
+    title: "Social Feed",
+    description: "Post your thoughts, share episode reactions, and connect with other fans in real time.",
     icon: MessagesSquare,
     image: "https://picsum.photos/id/122/800/600"
   },
   {
-    id: "arena",
-    title: "Power Level Arena",
-    description: "Debate hot takes and vote on character matchups. Climb the leaderboard by winning arguments.",
+    id: "discussions",
+    title: "Episode Discussions",
+    description: "Jump into episode-specific threads and share your reactions the moment an episode drops.",
     icon: Swords,
     image: "https://picsum.photos/id/133/800/600"
   },
   {
     id: "library",
     title: "Anime Library",
-    description: "Track your watching progress, rate episodes, and get AI-powered recommendations based on your guild activity.",
+    description: "Track what you're watching, what you've finished, and get recommendations tailored to your taste.",
     icon: Tv,
     image: "https://picsum.photos/id/234/800/600"
   },
   {
-    id: "quests",
-    title: "Daily Quests",
-    description: "Complete daily viewing challenges to earn XP and unlock exclusive profile frames and badges.",
+    id: "discover",
+    title: "Discover",
+    description: "Find new shows, trending titles, and hidden gems surfaced by the community — not just an algorithm.",
     icon: Trophy,
     image: "https://picsum.photos/id/452/800/600"
   }
@@ -66,12 +66,12 @@ export const FEATURES: FeatureItem[] = [
 export const STATS: StatItem[] = [
   { label: "Active Users", value: "150K+" },
   { label: "Anime Tracked", value: "2.5M+" },
-  { label: "Guilds Created", value: "12K+" },
-  { label: "Daily Debates", value: "45K+" },
+  { label: "Posts Shared", value: "12K+" },
+  { label: "Daily Discussions", value: "45K+" },
 ];
 
 export const TEAM: TeamMember[] = [
-  { name: "Kai", role: "Founder & Lead Dev", avatar: "https://picsum.photos/id/1005/200/200" },
+  { name: "Kade", role: "Founder & Lead Dev", avatar: "https://static.wikia.nocookie.net/gachiakuta/images/thumb/2/2e/Rudo_anime.png/250px-Rudo_anime.png" },
   { name: "Yuki", role: "Head of Design", avatar: "https://picsum.photos/id/1011/200/200" },
   { name: "Ren", role: "Community Manager", avatar: "https://picsum.photos/id/1025/200/200" },
 ];

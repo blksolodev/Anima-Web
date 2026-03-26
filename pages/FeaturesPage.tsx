@@ -13,9 +13,9 @@ export const FeaturesPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-20"
         >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">System Features</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Features</h1>
           <p className="text-[#A0A0B0] max-w-2xl mx-auto text-lg">
-            Explore the tools and mechanics that make Anima the ultimate social RPG for anime fans.
+            Everything Anima offers to make your anime experience more social, more organized, and more fun.
           </p>
         </motion.div>
 
@@ -42,17 +42,15 @@ export const FeaturesPage: React.FC = () => {
                   <p className="text-[#A0A0B0] text-lg leading-relaxed">
                     {feature.description}
                   </p>
-                  <p className="text-[#6B6B7B]">
-                    Detailed description goes here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                    Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                    Enhance your anime experience with social layers designed for engagement.
-                  </p>
-                  
                   <ul className="space-y-3 mt-4">
-                    {[1, 2, 3].map((i) => (
+                    {[
+                      "Built for fans who want real conversation, not just a list",
+                      "Works across mobile and web — always in sync",
+                      "Clean, fast, and ad-free"
+                    ].map((point, i) => (
                       <li key={i} className="flex items-center gap-3 text-sm text-[#A0A0B0]">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-                        Sub-feature benefit or mechanic explanation {i}
+                        {point}
                       </li>
                     ))}
                   </ul>
