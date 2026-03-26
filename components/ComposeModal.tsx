@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Image as ImageIcon, Tv, EyeOff, AlertTriangle, Loader2,
-  Search, ChevronDown, CheckCircle2,
+  Search, ChevronDown, CheckCircle2, MessagesSquare,
 } from 'lucide-react';
+import { doc, setDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { useAuthStore } from '../store/useAuthStore';
 import { useComposeStore } from '../store/useComposeStore';
 import { useFeedStore } from '../store/useFeedStore';
@@ -15,7 +17,7 @@ const GIPHY_KEY = (import.meta as any).env?.VITE_GIPHY_API_KEY ?? '';
 const GIPHY_BASE = 'https://api.giphy.com/v1/gifs';
 const MAX_CHARS = 280;
 
-type Panel = 'none' | 'gif' | 'anime';
+type Panel = 'none' | 'gif' | 'anime' | 'discussion';
 
 interface GiphyGif {
   id: string;
@@ -23,6 +25,17 @@ interface GiphyGif {
   previewUrl: string;
   width: number;
   height: number;
+}
+
+interface DiscussionSelection {
+  type: 'episode' | 'live';
+  discussionId: string;
+  discussionTitle: string;
+  animeId?: number;
+  animeName?: string;
+  animeCover?: string;
+  season?: number;
+  episode?: number;
 }
 
 const parseGiphy = (results: any[]): GiphyGif[] =>
@@ -76,7 +89,6 @@ const GifPanel: React.FC<{ onSelect: (gif: GiphyGif) => void }> = ({ onSelect })
 
   return (
     <div className="border-t border-white/10">
-      {/* Search */}
       <div className="px-4 pt-3 pb-2">
         <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-2 border border-white/10">
           <Search size={14} className="text-[#A0A0B0] flex-shrink-0" />
@@ -183,6 +195,208 @@ const AnimePanel: React.FC<{ onSelect: (ref: AnimeReference) => void }> = ({ onS
   );
 };
 
+// ─── Discussion Panel ──────────────────────────────────────────────────────────
+const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> = ({ onSelect }) => {
+  const [tab, setTab] = useState<'episode' | 'live'>('episode');
+
+  // Episode tab
+  const [animeQuery, setAnimeQuery] = useState('');
+  const [animeResults, setAnimeResults] = useState<any[]>([]);
+  const [animeLoading, setAnimeLoading] = useState(false);
+  const [selectedAnime, setSelectedAnime] = useState<any | null>(null);
+  const [season, setSeason] = useState('1');
+  const [episode, setEpisode] = useState('');
+
+  // Live tab
+  const [liveTitle, setLiveTitle] = useState('');
+
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchAnime = useCallback(async (q: string) => {
+    if (q.length < 2) { setAnimeResults([]); return; }
+    setAnimeLoading(true);
+    try {
+      const data = await fetchAniList(SEARCH_ANIME, { search: q, page: 1, perPage: 6 });
+      setAnimeResults(data.Page.media ?? []);
+    } catch {
+      setAnimeResults([]);
+    } finally {
+      setAnimeLoading(false);
+    }
+  }, []);
+
+  const handleAnimeSearch = (v: string) => {
+    setAnimeQuery(v);
+    setSelectedAnime(null);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => searchAnime(v), 350);
+  };
+
+  const canConfirmEpisode = selectedAnime && episode.trim() && parseInt(episode) > 0;
+  const canConfirmLive = liveTitle.trim().length >= 3 && liveTitle.trim().length <= 80;
+
+  const handleConfirmEpisode = () => {
+    if (!canConfirmEpisode) return;
+    const s = season.trim() || '1';
+    const e = episode.trim();
+    const animeName = selectedAnime.title.english || selectedAnime.title.romaji;
+    const displayTitle = `${animeName} · S${s}E${e}`;
+    onSelect({
+      type: 'episode',
+      discussionId: `ep_${selectedAnime.id}_s${s}_e${e}`,
+      discussionTitle: displayTitle,
+      animeId: selectedAnime.id,
+      animeName,
+      animeCover: selectedAnime.coverImage.large,
+      season: parseInt(s),
+      episode: parseInt(e),
+    });
+  };
+
+  const handleConfirmLive = () => {
+    if (!canConfirmLive) return;
+    const rand = Math.random().toString(36).slice(2, 7);
+    onSelect({
+      type: 'live',
+      discussionId: `live_${Date.now()}_${rand}`,
+      discussionTitle: liveTitle.trim(),
+    });
+  };
+
+  return (
+    <div className="border-t border-white/10">
+      {/* Tabs */}
+      <div className="flex gap-2 px-4 pt-3">
+        <button
+          onClick={() => setTab('episode')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${tab === 'episode' ? 'bg-[#FF6B35]/20 text-[#FF6B35]' : 'text-[#A0A0B0] hover:bg-white/5'}`}
+        >
+          Episode Discussion
+        </button>
+        <button
+          onClick={() => setTab('live')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${tab === 'live' ? 'bg-[#FF6B35]/20 text-[#FF6B35]' : 'text-[#A0A0B0] hover:bg-white/5'}`}
+        >
+          Live Discussion
+        </button>
+      </div>
+
+      {tab === 'episode' ? (
+        <div className="px-4 pb-4 pt-2 space-y-3">
+          {!selectedAnime ? (
+            <>
+              <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-2 border border-white/10">
+                <Search size={14} className="text-[#A0A0B0] flex-shrink-0" />
+                <input
+                  type="text"
+                  value={animeQuery}
+                  onChange={(e) => handleAnimeSearch(e.target.value)}
+                  placeholder="Search anime..."
+                  className="flex-1 bg-transparent text-sm text-white placeholder-[#6B6B7B] focus:outline-none"
+                  autoFocus
+                />
+              </div>
+              <div className="max-h-36 overflow-y-auto space-y-0.5">
+                {animeLoading ? (
+                  <div className="flex justify-center py-3">
+                    <Loader2 className="animate-spin text-[#FF6B35]" size={18} />
+                  </div>
+                ) : animeResults.map((item: any) => {
+                  const title = item.title.english || item.title.romaji;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => { setSelectedAnime(item); setAnimeQuery(''); }}
+                      className="flex items-center gap-3 w-full px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                    >
+                      <img src={item.coverImage.large} alt={title} className="w-7 h-10 object-cover rounded" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{title}</p>
+                        <p className="text-xs text-[#A0A0B0]">{item.format} · {item.episodes ?? '?'} eps</p>
+                      </div>
+                    </button>
+                  );
+                })}
+                {!animeLoading && animeResults.length === 0 && animeQuery.length > 1 && (
+                  <p className="text-center text-[#A0A0B0] text-xs py-3">No results</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Selected anime chip */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-xl border border-white/10">
+                <img src={selectedAnime.coverImage.large} alt="" className="w-7 h-10 object-cover rounded flex-shrink-0" />
+                <p className="text-sm font-medium text-white flex-1 truncate">
+                  {selectedAnime.title.english || selectedAnime.title.romaji}
+                </p>
+                <button onClick={() => setSelectedAnime(null)} className="text-[#A0A0B0] hover:text-white flex-shrink-0">
+                  <X size={14} />
+                </button>
+              </div>
+              {/* Season + Episode inputs */}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="text-[10px] text-[#6B6B7B] uppercase tracking-wider mb-1 block">Season</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={season}
+                    onChange={(e) => setSeason(e.target.value)}
+                    placeholder="1"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B7B] focus:outline-none focus:border-[#FF6B35]/50"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-[10px] text-[#6B6B7B] uppercase tracking-wider mb-1 block">Episode *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={episode}
+                    onChange={(e) => setEpisode(e.target.value)}
+                    placeholder="e.g. 12"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B7B] focus:outline-none focus:border-[#FF6B35]/50"
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleConfirmEpisode}
+                disabled={!canConfirmEpisode}
+                className="w-full py-2 rounded-xl bg-[#FF6B35] hover:bg-[#FF8A50] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors"
+              >
+                Start Discussion
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="px-4 pb-4 pt-2 space-y-3">
+          <div>
+            <label className="text-[10px] text-[#6B6B7B] uppercase tracking-wider mb-1 block">Discussion Title</label>
+            <input
+              type="text"
+              value={liveTitle}
+              onChange={(e) => setLiveTitle(e.target.value.slice(0, 80))}
+              placeholder="e.g. Watch party for tonight's drop"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B7B] focus:outline-none focus:border-[#FF6B35]/50"
+              autoFocus
+            />
+            <p className="text-[10px] text-[#6B6B7B] mt-1 text-right">{liveTitle.length}/80</p>
+          </div>
+          <button
+            onClick={handleConfirmLive}
+            disabled={!canConfirmLive}
+            className="w-full py-2 rounded-xl bg-[#FF6B35] hover:bg-[#FF8A50] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors"
+          >
+            Start Live Discussion
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Main ComposeModal ─────────────────────────────────────────────────────────
 export const ComposeModal: React.FC = () => {
   const { isOpen, replyTo, close } = useComposeStore();
@@ -193,6 +407,7 @@ export const ComposeModal: React.FC = () => {
   const [activePanel, setActivePanel] = useState<Panel>('none');
   const [media, setMedia] = useState<{ file?: File; url: string; type: 'image' | 'gif' | 'video'; width?: number; height?: number } | null>(null);
   const [animeRef, setAnimeRef] = useState<AnimeReference | null>(null);
+  const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionSelection | null>(null);
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [isMature, setIsMature] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -215,6 +430,7 @@ export const ComposeModal: React.FC = () => {
       setContent('');
       setMedia(null);
       setAnimeRef(null);
+      setSelectedDiscussion(null);
       setIsSpoiler(false);
       setIsMature(false);
       setActivePanel('none');
@@ -262,6 +478,11 @@ export const ComposeModal: React.FC = () => {
     setActivePanel('none');
   };
 
+  const handleDiscussionSelect = (d: DiscussionSelection) => {
+    setSelectedDiscussion(d);
+    setActivePanel('none');
+  };
+
   const handlePost = async () => {
     if (!user || !canPost) return;
     setPosting(true);
@@ -301,13 +522,38 @@ export const ComposeModal: React.FC = () => {
         auraColor: '#7C3AED',
       };
 
-      await createPost(content.trim(), author, {
+      const postId = await createPost(content.trim(), author, {
         mediaAttachment,
         animeReference: animeRef ?? undefined,
         isSpoiler,
         isMature,
         parentId: replyTo?.postId,
       });
+
+      // Discussion: write discussion doc + patch post with discussion fields
+      if (selectedDiscussion) {
+        const discussionDoc: Record<string, any> = {
+          type: selectedDiscussion.type,
+          title: selectedDiscussion.discussionTitle,
+          createdBy: user.id,
+          createdAt: serverTimestamp(),
+          postCount: increment(1),
+        };
+        if (selectedDiscussion.animeId != null) discussionDoc.animeId = selectedDiscussion.animeId;
+        if (selectedDiscussion.animeName) discussionDoc.animeName = selectedDiscussion.animeName;
+        if (selectedDiscussion.animeCover) discussionDoc.animeCover = selectedDiscussion.animeCover;
+        if (selectedDiscussion.season != null) discussionDoc.season = selectedDiscussion.season;
+        if (selectedDiscussion.episode != null) discussionDoc.episode = selectedDiscussion.episode;
+
+        await Promise.all([
+          setDoc(doc(db, 'discussions', selectedDiscussion.discussionId), discussionDoc, { merge: true }),
+          updateDoc(doc(db, 'quests', postId), {
+            discussionType: selectedDiscussion.type,
+            discussionId: selectedDiscussion.discussionId,
+            discussionTitle: selectedDiscussion.discussionTitle,
+          }),
+        ]);
+      }
 
       close();
     } catch (err) {
@@ -407,6 +653,22 @@ export const ComposeModal: React.FC = () => {
                     className="w-full bg-transparent resize-none text-white placeholder-[#6B6B7B] focus:outline-none text-base leading-relaxed"
                   />
 
+                  {/* Discussion badge */}
+                  {selectedDiscussion && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-[#4ECDC4]/10 border border-[#4ECDC4]/20 rounded-xl mb-3">
+                      <MessagesSquare size={14} className="text-[#4ECDC4] flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-[#4ECDC4] uppercase tracking-wider font-semibold">
+                          {selectedDiscussion.type === 'episode' ? 'Episode Discussion' : 'Live Discussion'}
+                        </p>
+                        <p className="text-sm text-white truncate">{selectedDiscussion.discussionTitle}</p>
+                      </div>
+                      <button onClick={() => setSelectedDiscussion(null)} className="text-[#A0A0B0] hover:text-white flex-shrink-0">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+
                   {/* Anime tag */}
                   {animeRef && (
                     <div className="flex items-center gap-2 px-3 py-2 bg-[#FF6B35]/10 border border-[#FF6B35]/20 rounded-xl mb-3">
@@ -450,7 +712,7 @@ export const ComposeModal: React.FC = () => {
               </div>
             </div>
 
-            {/* GIF / Anime panels */}
+            {/* GIF / Anime / Discussion panels */}
             <AnimatePresence>
               {activePanel === 'gif' && (
                 <motion.div key="gif" initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} style={{ overflow: 'hidden' }}>
@@ -460,6 +722,11 @@ export const ComposeModal: React.FC = () => {
               {activePanel === 'anime' && (
                 <motion.div key="anime" initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} style={{ overflow: 'hidden' }}>
                   <AnimePanel onSelect={handleAnimeSelect} />
+                </motion.div>
+              )}
+              {activePanel === 'discussion' && (
+                <motion.div key="discussion" initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} style={{ overflow: 'hidden' }}>
+                  <DiscussionPanel onSelect={handleDiscussionSelect} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -495,6 +762,15 @@ export const ComposeModal: React.FC = () => {
                   className={`p-2 rounded-full transition-colors ${activePanel === 'anime' ? 'bg-[#4ECDC4]/20 text-[#4ECDC4]' : 'text-[#4ECDC4] hover:bg-[#4ECDC4]/10'}`}
                 >
                   <Tv size={20} />
+                </button>
+
+                {/* Discussion */}
+                <button
+                  onClick={() => togglePanel('discussion')}
+                  title="Start a discussion"
+                  className={`p-2 rounded-full transition-colors ${activePanel === 'discussion' || selectedDiscussion ? 'bg-[#4ECDC4]/20 text-[#4ECDC4]' : 'text-[#A0A0B0] hover:bg-white/5 hover:text-[#4ECDC4]'}`}
+                >
+                  <MessagesSquare size={20} />
                 </button>
 
                 {/* Spoiler */}
