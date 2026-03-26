@@ -24,6 +24,8 @@ const buildUserDoc = (uid: string, username: string, email: string, displayName?
   powerLevel: 1,
   xp: 0,
   auraColor: DEFAULT_AURA_COLOR,
+  onboardingComplete: false,
+  favoriteGenres: [],
   stats: {
     followersCount: 0,
     followingCount: 0,

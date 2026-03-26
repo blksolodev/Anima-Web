@@ -21,6 +21,7 @@ import { PostDetail } from './pages/app/PostDetail';
 import { UserProfile } from './pages/app/UserProfile';
 import { AnimeDetail } from './pages/app/AnimeDetail';
 
+import { Onboarding } from './pages/Onboarding';
 import { useAuthStore } from './store/useAuthStore';
 import { Loader2 } from 'lucide-react';
 
@@ -52,6 +53,25 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (!user) return <Navigate to="/login" replace />;
+  if (user.onboardingComplete === false) return <Navigate to="/onboarding" replace />;
+
+  return <>{children}</>;
+};
+
+// Onboarding requires auth but not completed onboarding
+const OnboardingRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuthStore();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0D0D14] flex items-center justify-center text-[#FF6B35]">
+        <Loader2 className="animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.onboardingComplete === true) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 };
@@ -101,6 +121,9 @@ const App: React.FC = () => {
         {/* Auth */}
         <Route path="/login" element={<div className="text-white scanlines"><Login /></div>} />
         <Route path="/register" element={<div className="text-white scanlines"><Register /></div>} />
+
+        {/* Onboarding */}
+        <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />

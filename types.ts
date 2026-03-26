@@ -47,6 +47,8 @@ export interface User {
   stats: UserStats;
   isGuest?: boolean;
   createdAt?: any;
+  onboardingComplete?: boolean;
+  favoriteGenres?: string[];
 }
 
 // Matches mobile QuestAuthor
