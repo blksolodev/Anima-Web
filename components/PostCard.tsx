@@ -45,7 +45,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, showRepliesInline = fa
   const handleRepost = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
-    repostPost(post.id, user.id);
+    repostPost(post.id, user.id, user, post);
   };
 
   const handleComment = (e: React.MouseEvent) => {

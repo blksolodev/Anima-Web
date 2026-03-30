@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart,
   MessageCircle,
+  Repeat2,
   UserPlus,
   AtSign,
   Tv,
@@ -19,19 +20,21 @@ import {
 } from '../../services/notification.service';
 import { Notification } from '../../types';
 
-type NotifTab = 'all' | 'likes' | 'replies' | 'follows' | 'mentions';
+type NotifTab = 'all' | 'likes' | 'reposts' | 'replies' | 'follows' | 'mentions';
 
 const TABS: { key: NotifTab; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'likes', label: 'Likes' },
+  { key: 'reposts', label: 'Reposts' },
   { key: 'replies', label: 'Replies' },
   { key: 'follows', label: 'Follows' },
   { key: 'mentions', label: 'Mentions' },
 ];
 
 const TAB_TYPES: Record<NotifTab, string[]> = {
-  all: ['like', 'reply', 'follow', 'mention', 'new_episode'],
+  all: ['like', 'repost', 'reply', 'follow', 'mention', 'new_episode'],
   likes: ['like'],
+  reposts: ['repost'],
   replies: ['reply'],
   follows: ['follow'],
   mentions: ['mention'],
@@ -40,6 +43,7 @@ const TAB_TYPES: Record<NotifTab, string[]> = {
 const typeIcon = (type: string) => {
   switch (type) {
     case 'like':        return <Heart size={18} className="text-[#EF4444] fill-[#EF4444]" />;
+    case 'repost':      return <Repeat2 size={18} className="text-[#10B981]" />;
     case 'reply':       return <MessageCircle size={18} className="text-[#4ECDC4]" />;
     case 'follow':      return <UserPlus size={18} className="text-[#FF6B35]" />;
     case 'mention':     return <AtSign size={18} className="text-[#F4D03F]" />;
@@ -51,6 +55,7 @@ const typeIcon = (type: string) => {
 const typeBg = (type: string) => {
   switch (type) {
     case 'like':        return 'bg-[#EF4444]/10';
+    case 'repost':      return 'bg-[#10B981]/10';
     case 'reply':       return 'bg-[#4ECDC4]/10';
     case 'follow':      return 'bg-[#FF6B35]/10';
     case 'mention':     return 'bg-[#F4D03F]/10';
@@ -220,11 +225,13 @@ export const Notifications: React.FC = () => {
                         ? 'started following you'
                         : notif.type === 'like'
                           ? 'liked your post'
-                          : notif.type === 'reply'
-                            ? 'replied to your post'
-                            : notif.type === 'mention'
-                              ? 'mentioned you'
-                              : 'interacted with you'}
+                          : notif.type === 'repost'
+                            ? 'reposted your post'
+                            : notif.type === 'reply'
+                              ? 'replied to your post'
+                              : notif.type === 'mention'
+                                ? 'mentioned you'
+                                : 'interacted with you'}
                   </p>
                   <p className="text-xs text-[#6B6B7B] mt-1">{formatTime(notif.createdAt)}</p>
                 </div>

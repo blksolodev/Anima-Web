@@ -34,6 +34,15 @@ export const hydrateIsLiked = async (userId: string, posts: Post[]): Promise<Pos
   return posts.map((p, i) => ({ ...p, isLiked: results[i] }));
 };
 
+// Hydrate isReposted for a list of posts given the current user
+export const hydrateIsReposted = async (userId: string, posts: Post[]): Promise<Post[]> => {
+  const repostChecks = posts.map((p) =>
+    getDoc(doc(db, 'users', userId, 'reposts', p.id)).then((s) => s.exists())
+  );
+  const results = await Promise.all(repostChecks);
+  return posts.map((p, i) => ({ ...p, isReposted: results[i] }));
+};
+
 // Subscribe to live feed (newest first)
 export const subscribeFeed = (
   onUpdate: (posts: Post[]) => void,

@@ -4,16 +4,37 @@ import {
   where,
   onSnapshot,
   updateDoc,
+  addDoc,
   doc,
   writeBatch,
   getDocs,
   limit,
+  serverTimestamp,
   Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Notification } from '../types';
+import { Notification, PostAuthor } from '../types';
 
 const NOTIFS = 'notifications';
+
+export interface CreateNotificationPayload {
+  type: Notification['type'];
+  fromUserId: string;
+  fromUser: Pick<PostAuthor, 'id' | 'username' | 'displayName' | 'avatarUrl'>;
+  targetUserId: string;
+  relatedPostId?: string;
+  content?: string;
+}
+
+export const createNotification = async (payload: CreateNotificationPayload): Promise<void> => {
+  // Never notify a user about their own actions
+  if (payload.fromUserId === payload.targetUserId) return;
+  await addDoc(collection(db, NOTIFS), {
+    ...payload,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+};
 
 const sortByDate = (a: Notification, b: Notification) => {
   const ta = (a.createdAt as any)?.seconds ?? 0;

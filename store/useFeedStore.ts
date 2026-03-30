@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { DocumentSnapshot } from 'firebase/firestore';
-import { Post, PostAuthor, MediaAttachment, AnimeReference } from '../types';
+import { Post, PostAuthor, MediaAttachment, AnimeReference, User } from '../types';
 import {
   subscribeFeed,
   loadMorePosts,
@@ -10,8 +10,10 @@ import {
   repostPost,
   unrepostPost,
   hydrateIsLiked,
+  hydrateIsReposted,
   CreatePostOptions,
 } from '../services/feed.service';
+import { createNotification } from '../services/notification.service';
 
 interface FeedState {
   posts: Post[];
@@ -27,7 +29,7 @@ interface FeedState {
   loadMore: () => Promise<void>;
   createPost: (content: string, author: PostAuthor, options?: CreatePostOptions) => Promise<string>;
   likePost: (postId: string, userId: string) => void;
-  repostPost: (postId: string, userId: string) => void;
+  repostPost: (postId: string, userId: string, currentUser?: User, post?: Post) => void;
 }
 
 export const useFeedStore = create<FeedState>((set, get) => ({
@@ -46,7 +48,8 @@ export const useFeedStore = create<FeedState>((set, get) => ({
 
     const unsub = subscribeFeed(
       async (rawPosts) => {
-        const posts = await hydrateIsLiked(userId, rawPosts).catch(() => rawPosts);
+        const withLikes = await hydrateIsLiked(userId, rawPosts).catch(() => rawPosts);
+        const posts = await hydrateIsReposted(userId, withLikes).catch(() => withLikes);
         set({
           posts,
           loading: false,
@@ -135,8 +138,8 @@ export const useFeedStore = create<FeedState>((set, get) => ({
     });
   },
 
-  repostPost: (postId, userId) => {
-    const post = get().posts.find((p) => p.id === postId);
+  repostPost: (postId, userId, currentUser, postArg) => {
+    const post = postArg ?? get().posts.find((p) => p.id === postId);
     if (!post) return;
 
     const wasReposted = post.isReposted ?? false;
@@ -149,7 +152,23 @@ export const useFeedStore = create<FeedState>((set, get) => ({
     }));
 
     const op = wasReposted ? unrepostPost : repostPost;
-    op(postId, userId).catch(() => {
+    op(postId, userId).then(() => {
+      // Fire repost notification (skip undo / skip own posts)
+      if (!wasReposted && currentUser && post.authorId !== userId) {
+        createNotification({
+          type: 'repost',
+          fromUserId: userId,
+          fromUser: {
+            id: currentUser.id,
+            username: currentUser.username,
+            displayName: currentUser.displayName,
+            avatarUrl: currentUser.avatarUrl,
+          },
+          targetUserId: post.authorId,
+          relatedPostId: postId,
+        }).catch(() => {});
+      }
+    }).catch(() => {
       set((s) => ({
         posts: s.posts.map((p) =>
           p.id === postId

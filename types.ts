@@ -34,6 +34,12 @@ export interface UserStats {
   postsCount: number;
 }
 
+export interface UserCosmetics {
+  frameId?: 'none' | 'fire' | 'neon' | 'sakura';
+  badgeId?: string;
+  themeId?: string;
+}
+
 export interface User {
   id: string;
   username: string;
@@ -49,6 +55,11 @@ export interface User {
   createdAt?: any;
   onboardingComplete?: boolean;
   favoriteGenres?: string[];
+  repostedQuests?: string[];
+  isPlus?: boolean;
+  plusSince?: string;
+  plusExpiry?: string;
+  cosmetics?: UserCosmetics;
 }
 
 // Matches mobile QuestAuthor
@@ -130,7 +141,7 @@ export interface LibraryEntry {
 
 export interface Notification {
   id: string;
-  type: 'like' | 'reply' | 'follow' | 'mention' | 'new_episode';
+  type: 'like' | 'reply' | 'follow' | 'mention' | 'new_episode' | 'repost';
   fromUserId: string;
   fromUser?: Pick<User, 'id' | 'username' | 'displayName' | 'avatarUrl'>;
   targetUserId: string;

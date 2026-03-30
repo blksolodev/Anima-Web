@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, RefreshCw, AlertCircle, Tv, Zap, PenSquare } from 'lucide-react';
 import { PostCard } from '../../components/PostCard';
+import { AdCard } from '../../components/AdCard';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFeedStore } from '../../store/useFeedStore';
 import { useComposeStore } from '../../store/useComposeStore';
@@ -106,8 +107,13 @@ export const Feed: React.FC = () => {
         <EmptyFeed onCompose={() => openCompose()} />
       ) : (
         <AnimatePresence initial={false}>
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+          {posts.map((post, index) => (
+            <React.Fragment key={post.id}>
+              <PostCard post={post} />
+              {!user?.isPlus && (index + 1) % 5 === 0 && (
+                <AdCard key={`ad-${index}`} />
+              )}
+            </React.Fragment>
           ))}
         </AnimatePresence>
       )}
