@@ -48,13 +48,29 @@ export const useFeedStore = create<FeedState>((set, get) => ({
 
     const unsub = subscribeFeed(
       async (rawPosts) => {
-        const withLikes = await hydrateIsLiked(userId, rawPosts).catch(() => rawPosts);
-        const posts = await hydrateIsReposted(userId, withLikes).catch(() => withLikes);
-        set({
-          posts,
-          loading: false,
-          lastDoc: null, // reset pagination on fresh data
+        const existingMap = new Map(get().posts.map((p) => [p.id, p]));
+
+        // Only hydrate posts we haven't seen before — preserves optimistic
+        // isLiked / isReposted state and avoids the race where the listener
+        // fires before the subcollection write has committed.
+        const unseen = rawPosts.filter((p) => !existingMap.has(p.id));
+        let hydratedUnseen = unseen;
+        if (unseen.length > 0) {
+          const withLikes = await hydrateIsLiked(userId, unseen).catch(() => unseen);
+          hydratedUnseen = await hydrateIsReposted(userId, withLikes).catch(() => withLikes);
+        }
+        const unseenMap = new Map(hydratedUnseen.map((p) => [p.id, p]));
+
+        const posts = rawPosts.map((p) => {
+          if (existingMap.has(p.id)) {
+            // Keep current interaction flags — don't let the listener overwrite them
+            const existing = existingMap.get(p.id)!;
+            return { ...p, isLiked: existing.isLiked, isReposted: existing.isReposted };
+          }
+          return unseenMap.get(p.id) ?? p;
         });
+
+        set({ posts, loading: false, lastDoc: null });
       },
       (err) => {
         console.error('[Feed] subscription error:', err);
