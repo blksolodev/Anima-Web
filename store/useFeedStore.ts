@@ -155,10 +155,13 @@ export const useFeedStore = create<FeedState>((set, get) => ({
   },
 
   repostPost: (postId, userId, currentUser, postArg) => {
-    const post = postArg ?? get().posts.find((p) => p.id === postId);
+    // Always read isReposted from live store state — postArg can be a stale
+    // React closure and would cause double-reposts if read directly.
+    const storePost = get().posts.find((p) => p.id === postId);
+    const post = storePost ?? postArg; // postArg used only as fallback for author info
     if (!post) return;
 
-    const wasReposted = post.isReposted ?? false;
+    const wasReposted = storePost?.isReposted ?? false;
     set((s) => ({
       posts: s.posts.map((p) =>
         p.id === postId

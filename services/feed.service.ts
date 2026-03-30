@@ -16,6 +16,8 @@ import {
   Unsubscribe,
   startAfter,
   DocumentSnapshot,
+  arrayUnion,
+  arrayRemove,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Post, PostAuthor, MediaAttachment, AnimeReference } from '../types';
@@ -34,13 +36,12 @@ export const hydrateIsLiked = async (userId: string, posts: Post[]): Promise<Pos
   return posts.map((p, i) => ({ ...p, isLiked: results[i] }));
 };
 
-// Hydrate isReposted for a list of posts given the current user
+// Hydrate isReposted — reads repostedQuests array from user doc (one read, matches mobile app)
 export const hydrateIsReposted = async (userId: string, posts: Post[]): Promise<Post[]> => {
-  const repostChecks = posts.map((p) =>
-    getDoc(doc(db, 'users', userId, 'reposts', p.id)).then((s) => s.exists())
-  );
-  const results = await Promise.all(repostChecks);
-  return posts.map((p, i) => ({ ...p, isReposted: results[i] }));
+  const userSnap = await getDoc(doc(db, 'users', userId));
+  const repostedQuests: string[] = userSnap.data()?.repostedQuests ?? [];
+  const repostedSet = new Set(repostedQuests);
+  return posts.map((p) => ({ ...p, isReposted: repostedSet.has(p.id) }));
 };
 
 // Subscribe to live feed (newest first)
@@ -136,14 +137,14 @@ export const unlikePost = async (postId: string, userId: string): Promise<void> 
 export const repostPost = async (postId: string, userId: string): Promise<void> => {
   await Promise.all([
     updateDoc(doc(db, QUESTS_COLLECTION, postId), { reposts: increment(1) }),
-    setDoc(doc(db, 'users', userId, 'reposts', postId), { postId, createdAt: serverTimestamp() }),
+    updateDoc(doc(db, 'users', userId), { repostedQuests: arrayUnion(postId) }),
   ]);
 };
 
 export const unrepostPost = async (postId: string, userId: string): Promise<void> => {
   await Promise.all([
     updateDoc(doc(db, QUESTS_COLLECTION, postId), { reposts: increment(-1) }),
-    deleteDoc(doc(db, 'users', userId, 'reposts', postId)),
+    updateDoc(doc(db, 'users', userId), { repostedQuests: arrayRemove(postId) }),
   ]);
 };
 
