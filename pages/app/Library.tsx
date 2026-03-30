@@ -196,7 +196,7 @@ export const Library: React.FC = () => {
   return (
     <div className="w-full max-w-3xl mx-auto pb-24">
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10 px-4 pt-4 pb-0">
+      <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10 px-4 pt-4 pb-0">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-bold">Library</h1>
           <button

@@ -65,7 +65,7 @@ const SettingRow: React.FC<{
 const SubPageHeader: React.FC<{ title: string }> = ({ title }) => {
   const navigate = useNavigate();
   return (
-    <div className="sticky top-0 z-10 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center gap-4">
+    <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center gap-4">
       <button
         onClick={() => navigate('/settings')}
         className="p-2 rounded-full hover:bg-white/5 transition-colors"
@@ -113,7 +113,7 @@ const SettingsHome: React.FC = () => {
   return (
     <div className="w-full max-w-2xl mx-auto pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3">
+      <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3">
         <h1 className="text-lg font-bold">Settings</h1>
       </div>
 

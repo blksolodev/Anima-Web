@@ -188,7 +188,7 @@ export const Messages: React.FC = () => {
         {activeChatId ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-[#0D0D14]/95 backdrop-blur z-10">
+            <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-[#0D0D14] sm:bg-[#0D0D14]/95 backdrop-blur sticky top-0 z-30">
               <button onClick={() => setActiveChatId(null)} className="md:hidden text-[#A0A0B0]">
                 <ChevronLeft size={24} />
               </button>
