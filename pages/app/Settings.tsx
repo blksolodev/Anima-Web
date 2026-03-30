@@ -14,10 +14,8 @@ import {
   Plus,
   Loader2,
   Check,
-  Zap,
 } from 'lucide-react';
 import { GlassCard } from '../../components/GlassCard';
-import { PlusBadge } from '../../components/PlusBadge';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 
@@ -108,8 +106,6 @@ const SettingsHome: React.FC = () => {
     },
   ];
 
-  const isPlusUser = user?.isPlus;
-
   return (
     <div className="w-full max-w-2xl mx-auto pb-20">
       {/* Header */}
@@ -135,34 +131,6 @@ const SettingsHome: React.FC = () => {
           <ChevronRight size={18} className="text-[#A0A0B0]" />
         </div>
       )}
-
-      {/* Anima Plus card */}
-      <div className="px-4 pt-4 mb-2">
-        <div
-          onClick={() => navigate('/subscription')}
-          className="relative overflow-hidden rounded-2xl border border-[#FF6B35]/30 cursor-pointer hover:border-[#FF6B35]/60 transition-colors"
-          style={{ background: 'linear-gradient(135deg, rgba(255,107,53,0.12), rgba(255,179,71,0.06))' }}
-        >
-          <div className="flex items-center gap-4 p-4">
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #FF6B35, #FFB347)' }}
-            >
-              <Zap size={22} fill="white" className="text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-sm font-bold text-white">Anima Plus</p>
-                {isPlusUser && <PlusBadge size="sm" />}
-              </div>
-              <p className="text-xs text-[#A0A0B0]">
-                {isPlusUser ? 'Manage your subscription' : 'Badges, frames, aura colors & more'}
-              </p>
-            </div>
-            <ChevronRight size={16} className="text-[#FF6B35] flex-shrink-0" />
-          </div>
-        </div>
-      </div>
 
       {/* Sections */}
       <div className="px-4 pt-2">

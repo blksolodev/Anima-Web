@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import { APP_NAV_LINKS, COLORS } from '../constants';
-import { LogOut, Settings, PenSquare, User as UserIcon, Zap } from 'lucide-react';
+import { LogOut, Settings, PenSquare, User as UserIcon } from 'lucide-react';
 import { Button } from './Button';
 import { useAuthStore } from '../store/useAuthStore';
 import { useComposeStore } from '../store/useComposeStore';
@@ -71,23 +71,6 @@ export const AppSidebar: React.FC = () => {
         <Button onClick={() => openCompose()} className="w-full mt-8 !rounded-xl" icon={<PenSquare size={18} />}>
           Post
         </Button>
-
-        {/* Anima Plus */}
-        <NavLink
-          to="/subscription"
-          className={({ isActive }) => `
-            flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 mt-2
-            ${isActive
-              ? 'bg-white/10 text-white font-medium'
-              : 'text-[#A0A0B0] hover:bg-white/5 hover:text-white'
-            }
-          `}
-        >
-          <Zap size={24} className="text-[#FF6B35]" fill={user?.isPlus ? 'currentColor' : 'none'} />
-          <span className={user?.isPlus ? 'text-[#FF6B35] font-semibold' : ''}>
-            {user?.isPlus ? 'Anima Plus' : 'Upgrade'}
-          </span>
-        </NavLink>
       </div>
 
       <div className="mt-auto p-6 border-t border-white/10">

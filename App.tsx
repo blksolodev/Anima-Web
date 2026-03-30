@@ -20,7 +20,6 @@ import { Settings } from './pages/app/Settings';
 import { PostDetail } from './pages/app/PostDetail';
 import { UserProfile } from './pages/app/UserProfile';
 import { AnimeDetail } from './pages/app/AnimeDetail';
-import { Subscription } from './pages/app/Subscription';
 
 import { Onboarding } from './pages/Onboarding';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
@@ -129,7 +128,6 @@ const App: React.FC = () => {
           <Route path="post/:postId" element={<PostDetail />} />
           <Route path="user/:userId" element={<UserProfile />} />
           <Route path="anime/:animeId" element={<AnimeDetail />} />
-          <Route path="subscription" element={<Subscription />} />
         </Route>
 
         {/* Catch-all */}
