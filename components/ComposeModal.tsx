@@ -13,7 +13,7 @@ import { uploadPostMedia, getImageDimensions, isVideoFile } from '../services/me
 import { fetchAniList, SEARCH_ANIME } from '../lib/anilist';
 import { AnimeReference, MediaAttachment } from '../types';
 
-const GIPHY_KEY = (import.meta as any).env?.VITE_GIPHY_API_KEY ?? '';
+const GIPHY_KEY = import.meta.env.VITE_GIPHY_API_KEY ?? '';
 const GIPHY_BASE = 'https://api.giphy.com/v1/gifs';
 const MAX_CHARS = 280;
 
@@ -583,15 +583,15 @@ export const ComposeModal: React.FC = () => {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           />
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] pointer-events-none">
+          {/* Modal — bottom sheet on mobile, centered dialog on sm+ */}
+          <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:justify-center sm:pt-[10vh] pointer-events-none">
           <motion.div
             key="modal"
-            initial={{ opacity: 0, scale: 0.96, y: -12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -12 }}
-            transition={{ duration: 0.18 }}
-            className="w-full max-w-xl bg-[#12121F] border border-white/10 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+            className="w-full sm:max-w-xl bg-[#12121F] border border-white/10 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

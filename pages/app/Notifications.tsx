@@ -122,7 +122,7 @@ export const Notifications: React.FC = () => {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* Sticky header */}
-      <div className="sticky top-0 z-30 bg-[#0D0D14]/80 backdrop-blur-xl border-b border-white/10">
+      <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10">
         <div className="flex items-center justify-between px-4 pt-4 pb-0">
           <h1 className="text-xl font-bold">
             Notifications

@@ -57,15 +57,15 @@ export const AppLayout: React.FC = () => {
         {/* Search */}
         <div className="relative mb-8">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A0A0B0]" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search anime, users, guilds..." 
+          <input
+            type="text"
+            placeholder="Search anime, users..."
             className="w-full bg-[#1A1A2E] border border-white/10 rounded-full py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-[#FF6B35] transition-colors"
           />
         </div>
 
         {/* Trending Anime */}
-        <div className="mb-8">
+        <div>
           <h3 className="font-bold text-lg mb-4">Trending This Season</h3>
           <div className="space-y-4">
             {loadingTrending ? (
@@ -84,25 +84,6 @@ export const AppLayout: React.FC = () => {
                 </GlassCard>
               ))
             )}
-          </div>
-        </div>
-
-        {/* Suggested Guilds */}
-        <div>
-          <h3 className="font-bold text-lg mb-4">Recommended Guilds</h3>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-               <div key={i} className="flex items-center justify-between">
-                 <div className="flex items-center gap-2">
-                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#FF8A50]" />
-                   <div>
-                     <p className="text-sm font-bold">JJK Spoilers</p>
-                     <p className="text-xs text-[#A0A0B0]">12k Members</p>
-                   </div>
-                 </div>
-                 <button className="text-[#FF6B35] text-xs font-bold hover:underline">Join</button>
-               </div>
-            ))}
           </div>
         </div>
       </aside>

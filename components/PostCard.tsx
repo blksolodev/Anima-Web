@@ -168,38 +168,38 @@ export const PostCard: React.FC<PostCardProps> = ({ post, showRepliesInline = fa
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-1 mt-2 text-[#A0A0B0] -ml-2">
+            <div className="flex items-center gap-0 mt-2 text-[#A0A0B0] -ml-2">
               <button
                 onClick={handleComment}
-                className="flex items-center gap-1.5 hover:text-[#06B6D4] group transition-colors px-2 py-1.5 rounded-full hover:bg-[#06B6D4]/10"
+                className="flex items-center gap-1.5 hover:text-[#06B6D4] group transition-colors px-3 py-2.5 rounded-full hover:bg-[#06B6D4]/10 active:scale-95"
               >
-                <MessageCircle size={17} />
+                <MessageCircle size={18} />
                 <span className="text-xs">{formatCount(post.replies || 0)}</span>
               </button>
 
               <button
                 onClick={handleRepost}
-                className={`flex items-center gap-1.5 group transition-colors px-2 py-1.5 rounded-full
+                className={`flex items-center gap-1.5 group transition-colors px-3 py-2.5 rounded-full active:scale-95
                   ${post.isReposted ? 'text-[#10B981]' : 'hover:text-[#10B981] hover:bg-[#10B981]/10'}`}
               >
-                <Repeat2 size={17} />
+                <Repeat2 size={18} />
                 <span className="text-xs">{formatCount(post.reposts || 0)}</span>
               </button>
 
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-1.5 group transition-colors px-2 py-1.5 rounded-full
+                className={`flex items-center gap-1.5 group transition-colors px-3 py-2.5 rounded-full active:scale-95
                   ${post.isLiked ? 'text-[#F43F5E]' : 'hover:text-[#F43F5E] hover:bg-[#F43F5E]/10'}`}
               >
-                <Heart size={17} fill={post.isLiked ? 'currentColor' : 'none'} />
+                <Heart size={18} fill={post.isLiked ? 'currentColor' : 'none'} />
                 <span className="text-xs">{formatCount(post.likes || 0)}</span>
               </button>
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 hover:text-[#FF6B2C] transition-colors px-2 py-1.5 rounded-full hover:bg-[#FF6B2C]/10 ml-auto"
+                className="flex items-center gap-1.5 hover:text-[#FF6B2C] transition-colors px-3 py-2.5 rounded-full hover:bg-[#FF6B2C]/10 ml-auto active:scale-95"
               >
-                <Share2 size={17} />
+                <Share2 size={18} />
               </button>
             </div>
 

@@ -41,7 +41,7 @@ export const PostDetail: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center gap-4">
+      <div className="sticky top-0 z-10 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
           className="p-2 rounded-full hover:bg-white/5 transition-colors"
