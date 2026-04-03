@@ -619,6 +619,44 @@ export const ComposeModal: React.FC = () => {
   const dashOffset = circumference * (1 - charRatio);
   const charColor = remaining <= 0 ? '#EF4444' : remaining <= 20 ? '#F59E0B' : '#FF6B35';
 
+  // Guest auth wall — shown instead of compose form
+  if (isOpen && !user) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          key="backdrop"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={close}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+        />
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center pointer-events-none">
+          <motion.div
+            key="guest-modal"
+            initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+            className="w-full sm:max-w-sm bg-[#12121F] border border-white/10 rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 pointer-events-auto text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={close} className="absolute top-4 right-4 text-[#6B6B7B] hover:text-white">
+              <X size={20} />
+            </button>
+            <img src="/logo.png" alt="Anima" className="h-10 w-auto mx-auto mb-4 opacity-80" />
+            <h2 className="text-xl font-bold text-white mb-2">Join the conversation</h2>
+            <p className="text-sm text-[#A0A0B0] mb-6">Create a free account to post, react, and connect with anime fans.</p>
+            <div className="flex flex-col gap-3">
+              <a href="#/register" onClick={close} className="block w-full py-3 rounded-2xl bg-[#FF6B35] hover:bg-[#FF8A50] text-white font-bold transition-colors">
+                Create Account
+              </a>
+              <a href="#/login" onClick={close} className="block w-full py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold transition-colors">
+                Sign In
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (

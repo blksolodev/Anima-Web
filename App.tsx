@@ -26,14 +26,13 @@ import { Onboarding } from './pages/Onboarding';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
 import { CommunityGuidelines } from './pages/CommunityGuidelines';
+import { AuthWall } from './components/AuthWall';
 import { useAuthStore } from './store/useAuthStore';
 import { Loader2 } from 'lucide-react';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 };
 
@@ -45,8 +44,9 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   </div>
 );
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuthStore();
+// Shows a loading spinner while auth resolves, then renders children regardless of auth state
+const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { loading, user } = useAuthStore();
 
   if (loading) {
     return (
@@ -56,16 +56,29 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.onboardingComplete === false) return <Navigate to="/onboarding" replace />;
+  // Redirect logged-in users who haven't completed onboarding
+  if (user && user.onboardingComplete === false) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
+  return <>{children}</>;
+};
+
+// Requires auth — shows AuthWall instead of redirecting so guests keep context
+const RequireAuth: React.FC<{
+  children: React.ReactNode;
+  title?: string;
+  message?: string;
+}> = ({ children, title, message }) => {
+  const { user, loading } = useAuthStore();
+  if (loading) return null;
+  if (!user) return <AuthWall title={title} message={message} />;
   return <>{children}</>;
 };
 
 // Onboarding requires auth but not completed onboarding
 const OnboardingRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuthStore();
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0D0D14] flex items-center justify-center text-[#FF6B35]">
@@ -73,10 +86,8 @@ const OnboardingRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
       </div>
     );
   }
-
   if (!user) return <Navigate to="/login" replace />;
   if (user.onboardingComplete === true) return <Navigate to="/" replace />;
-
   return <>{children}</>;
 };
 
@@ -92,7 +103,7 @@ const App: React.FC = () => {
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Public Marketing — must be before the protected "/" parent */}
+        {/* Public Marketing */}
         <Route path="/download" element={<MarketingLayout><DownloadPage /></MarketingLayout>} />
         <Route path="/features" element={<MarketingLayout><FeaturesPage /></MarketingLayout>} />
         <Route path="/about" element={<MarketingLayout><AboutPage /></MarketingLayout>} />
@@ -107,29 +118,52 @@ const App: React.FC = () => {
         {/* Onboarding */}
         <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
 
-        {/* Protected App Shell */}
+        {/* App Shell — accessible to guests, auth resolved before render */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <AppShell>
               <div className="scanlines">
                 <AppLayout />
               </div>
-            </ProtectedRoute>
+            </AppShell>
           }
         >
+          {/* Public routes — guests can browse */}
           <Route index element={<Feed />} />
           <Route path="feed" element={<Navigate to="/" replace />} />
-          <Route path="library" element={<Library />} />
-          <Route path="profile" element={<Profile />} />
           <Route path="discover" element={<Discover />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="settings/*" element={<Settings />} />
           <Route path="post/:postId" element={<PostDetail />} />
           <Route path="user/:userId" element={<UserProfile />} />
           <Route path="anime/:animeId" element={<AnimeDetail />} />
           <Route path="discussion/:discussionId" element={<DiscussionRoom />} />
+
+          {/* Auth-required routes — show AuthWall for guests */}
+          <Route path="profile" element={
+            <RequireAuth title="Your Profile" message="Sign in to view and manage your profile.">
+              <Profile />
+            </RequireAuth>
+          } />
+          <Route path="library" element={
+            <RequireAuth title="Your Library" message="Sign in to track your anime and manage your watchlist.">
+              <Library />
+            </RequireAuth>
+          } />
+          <Route path="notifications" element={
+            <RequireAuth title="Notifications" message="Sign in to see your likes, replies, and follows.">
+              <Notifications />
+            </RequireAuth>
+          } />
+          <Route path="messages" element={
+            <RequireAuth title="Messages" message="Sign in to send and receive direct messages.">
+              <Messages />
+            </RequireAuth>
+          } />
+          <Route path="settings/*" element={
+            <RequireAuth title="Settings" message="Sign in to manage your account settings.">
+              <Settings />
+            </RequireAuth>
+          } />
         </Route>
 
         {/* Catch-all */}

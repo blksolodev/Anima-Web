@@ -16,12 +16,11 @@ export const Feed: React.FC = () => {
   const [tab, setTab] = useState<FeedTab>('foryou');
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Subscribe to real-time feed on mount
+  // Subscribe to real-time feed — works for guests too (no like/repost hydration)
   useEffect(() => {
-    if (!user) return;
-    subscribe(user.id);
+    subscribe(user?.id ?? '');
     return () => unsubscribe();
-  }, [user, subscribe, unsubscribe]);
+  }, [user?.id, subscribe, unsubscribe]);
 
   // Infinite scroll — load more when bottom sentinel enters view
   const handleScroll = useCallback(() => {

@@ -28,8 +28,6 @@ export const AppSidebar: React.FC = () => {
     navigate('/login');
   };
 
-  if (!user) return null;
-
   return (
     <aside className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-white/10 bg-[#0D0D14] z-50">
       <div className="p-6">
@@ -74,30 +72,49 @@ export const AppSidebar: React.FC = () => {
       </div>
 
       <div className="mt-auto p-6 border-t border-white/10">
-        <div className="flex items-center gap-3 mb-4">
-          <Link to="/profile" className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors">
-            <img
-              src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.username}&background=random`}
-              alt={user.username}
-              className="w-10 h-10 rounded-full border border-white/10 object-cover flex-shrink-0"
-            />
-            <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-bold truncate">{user.displayName}</p>
-              <p className="text-xs text-[#A0A0B0] truncate">@{user.username}</p>
+        {user ? (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <Link to="/profile" className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors">
+                <img
+                  src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.username}&background=random`}
+                  alt={user.username}
+                  className="w-10 h-10 rounded-full border border-white/10 object-cover flex-shrink-0"
+                />
+                <div className="flex-1 overflow-hidden">
+                  <p className="text-sm font-bold truncate">{user.displayName}</p>
+                  <p className="text-xs text-[#A0A0B0] truncate">@{user.username}</p>
+                </div>
+              </Link>
+              <Link to="/settings" className="p-2 rounded-xl hover:bg-white/5 transition-colors text-[#A0A0B0] hover:text-white flex-shrink-0">
+                <Settings size={18} />
+              </Link>
             </div>
-          </Link>
-          <Link to="/settings" className="p-2 rounded-xl hover:bg-white/5 transition-colors text-[#A0A0B0] hover:text-white flex-shrink-0">
-            <Settings size={18} />
-          </Link>
-        </div>
-        
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-2 text-[#EF4444] text-sm hover:text-[#EF4444]/80 transition-colors w-full"
-        >
-          <LogOut size={18} />
-          Sign Out
-        </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-2 text-[#EF4444] text-sm hover:text-[#EF4444]/80 transition-colors w-full"
+            >
+              <LogOut size={18} />
+              Sign Out
+            </button>
+          </>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => navigate('/register')}
+              className="w-full py-2.5 rounded-xl bg-[#FF6B35] hover:bg-[#FF8A50] text-white font-bold text-sm transition-colors"
+            >
+              Create Account
+            </button>
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2"
+            >
+              <UserIcon size={16} />
+              Sign In
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

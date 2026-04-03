@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { DocumentSnapshot } from 'firebase/firestore';
-import { Post, PostAuthor, MediaAttachment, AnimeReference, User } from '../types';
+import { Post, PostAuthor, User } from '../types';
 import {
   subscribeFeed,
   loadMorePosts,
@@ -58,7 +58,7 @@ export const useFeedStore = create<FeedState>((set, get) => ({
         // fires before the subcollection write has committed.
         const unseen = rawPosts.filter((p) => !existingMap.has(p.id));
         let hydratedUnseen = unseen;
-        if (unseen.length > 0) {
+        if (unseen.length > 0 && userId) {
           const withLikes = await hydrateIsLiked(userId, unseen).catch(() => unseen);
           hydratedUnseen = await hydrateIsReposted(userId, withLikes).catch(() => withLikes);
         }

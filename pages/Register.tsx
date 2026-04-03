@@ -183,6 +183,15 @@ export const Register: React.FC = () => {
             </p>
           </div>
         </GlassCard>
+
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => navigate('/')}
+            className="text-[#6B6B7B] text-sm hover:text-[#A0A0B0] transition-colors"
+          >
+            Continue without an account →
+          </button>
+        </div>
       </div>
     </div>
   );
