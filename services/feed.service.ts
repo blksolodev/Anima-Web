@@ -148,6 +148,20 @@ export const unrepostPost = async (postId: string, userId: string): Promise<void
   ]);
 };
 
+export const deletePost = async (postId: string, authorId: string): Promise<void> => {
+  await deleteDoc(doc(db, QUESTS_COLLECTION, postId));
+  await updateDoc(doc(db, 'users', authorId), { 'stats.postsCount': increment(-1) }).catch(() => {});
+};
+
+export const reportPost = async (postId: string, reporterId: string, reason: string): Promise<void> => {
+  await addDoc(collection(db, 'reports'), {
+    postId,
+    reporterId,
+    reason,
+    createdAt: serverTimestamp(),
+  });
+};
+
 // Get replies for a post
 export const subscribReplies = (
   postId: string,

@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { doc, setDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { getDiscussion } from '../services/discussion.service';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useComposeStore } from '../store/useComposeStore';
 import { useFeedStore } from '../store/useFeedStore';
@@ -34,7 +36,6 @@ interface DiscussionSelection {
   animeId?: number;
   animeName?: string;
   animeCover?: string;
-  season?: number;
   episode?: number;
 }
 
@@ -196,7 +197,10 @@ const AnimePanel: React.FC<{ onSelect: (ref: AnimeReference) => void }> = ({ onS
 };
 
 // ─── Discussion Panel ──────────────────────────────────────────────────────────
-const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> = ({ onSelect }) => {
+const DiscussionPanel: React.FC<{
+  onSelect: (d: DiscussionSelection) => void;
+  onJoinRoom: (id: string) => void;
+}> = ({ onSelect, onJoinRoom }) => {
   const [tab, setTab] = useState<'episode' | 'live'>('episode');
 
   // Episode tab
@@ -204,8 +208,12 @@ const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> 
   const [animeResults, setAnimeResults] = useState<any[]>([]);
   const [animeLoading, setAnimeLoading] = useState(false);
   const [selectedAnime, setSelectedAnime] = useState<any | null>(null);
-  const [season, setSeason] = useState('1');
   const [episode, setEpisode] = useState('');
+
+  // Existing room check
+  const [checkingRoom, setCheckingRoom] = useState(false);
+  const [existingRoomId, setExistingRoomId] = useState<string | null>(null);
+  const [existingMsgCount, setExistingMsgCount] = useState(0);
 
   // Live tab
   const [liveTitle, setLiveTitle] = useState('');
@@ -228,6 +236,7 @@ const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> 
   const handleAnimeSearch = (v: string) => {
     setAnimeQuery(v);
     setSelectedAnime(null);
+    setExistingRoomId(null);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => searchAnime(v), 350);
   };
@@ -235,20 +244,29 @@ const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> 
   const canConfirmEpisode = selectedAnime && episode.trim() && parseInt(episode) > 0;
   const canConfirmLive = liveTitle.trim().length >= 3 && liveTitle.trim().length <= 80;
 
-  const handleConfirmEpisode = () => {
+  const handleConfirmEpisode = async () => {
     if (!canConfirmEpisode) return;
-    const s = season.trim() || '1';
     const e = episode.trim();
+    const id = `ep_${selectedAnime.id}_e${e}`;
+
+    setCheckingRoom(true);
+    const existing = await getDiscussion(id);
+    setCheckingRoom(false);
+
+    if (existing) {
+      setExistingRoomId(id);
+      setExistingMsgCount(existing.messageCount ?? 0);
+      return;
+    }
+
     const animeName = selectedAnime.title.english || selectedAnime.title.romaji;
-    const displayTitle = `${animeName} · S${s}E${e}`;
     onSelect({
       type: 'episode',
-      discussionId: `ep_${selectedAnime.id}_s${s}_e${e}`,
-      discussionTitle: displayTitle,
+      discussionId: id,
+      discussionTitle: `${animeName} · Ep ${e}`,
       animeId: selectedAnime.id,
       animeName,
       animeCover: selectedAnime.coverImage.large,
-      season: parseInt(s),
       episode: parseInt(e),
     });
   };
@@ -334,39 +352,70 @@ const DiscussionPanel: React.FC<{ onSelect: (d: DiscussionSelection) => void }> 
                   <X size={14} />
                 </button>
               </div>
-              {/* Season + Episode inputs */}
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="text-[10px] text-[#6B6B7B] uppercase tracking-wider mb-1 block">Season</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={season}
-                    onChange={(e) => setSeason(e.target.value)}
-                    placeholder="1"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B7B] focus:outline-none focus:border-[#FF6B35]/50"
-                  />
-                </div>
-                <div className="flex-1">
+              {/* Episode input */}
+              {!existingRoomId && (
+                <div>
                   <label className="text-[10px] text-[#6B6B7B] uppercase tracking-wider mb-1 block">Episode *</label>
                   <input
                     type="number"
                     min="1"
                     value={episode}
-                    onChange={(e) => setEpisode(e.target.value)}
+                    onChange={(e) => { setEpisode(e.target.value); setExistingRoomId(null); }}
                     placeholder="e.g. 12"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-[#6B6B7B] focus:outline-none focus:border-[#FF6B35]/50"
                     autoFocus
                   />
                 </div>
-              </div>
-              <button
-                onClick={handleConfirmEpisode}
-                disabled={!canConfirmEpisode}
-                className="w-full py-2 rounded-xl bg-[#FF6B35] hover:bg-[#FF8A50] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors"
-              >
-                Start Discussion
-              </button>
+              )}
+
+              {/* Existing room card */}
+              {existingRoomId ? (
+                <div className="bg-[#06B6D4]/10 border border-[#06B6D4]/20 rounded-xl p-3 space-y-2">
+                  <p className="text-xs font-semibold text-[#06B6D4]">Room already active</p>
+                  <p className="text-xs text-[#A0A0B0]">{existingMsgCount} message{existingMsgCount !== 1 ? 's' : ''} so far</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onJoinRoom(existingRoomId)}
+                      className="flex-1 py-2 rounded-xl bg-[#06B6D4] hover:bg-[#06B6D4]/80 text-white text-xs font-bold transition-colors"
+                    >
+                      Join the Room
+                    </button>
+                    <button
+                      onClick={() => {
+                        const e = episode.trim();
+                        const animeName = selectedAnime.title.english || selectedAnime.title.romaji;
+                        onSelect({
+                          type: 'episode',
+                          discussionId: existingRoomId,
+                          discussionTitle: `${animeName} · Ep ${e}`,
+                          animeId: selectedAnime.id,
+                          animeName,
+                          animeCover: selectedAnime.coverImage.large,
+                          episode: parseInt(e),
+                        });
+                      }}
+                      className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-colors"
+                    >
+                      Post to feed
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => { setExistingRoomId(null); setEpisode(''); }}
+                    className="text-[10px] text-[#6B6B7B] hover:text-[#A0A0B0] w-full text-center"
+                  >
+                    Change episode
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleConfirmEpisode}
+                  disabled={!canConfirmEpisode || checkingRoom}
+                  className="w-full py-2 rounded-xl bg-[#FF6B35] hover:bg-[#FF8A50] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                >
+                  {checkingRoom ? <Loader2 size={14} className="animate-spin" /> : null}
+                  {checkingRoom ? 'Checking…' : 'Find / Start Discussion'}
+                </button>
+              )}
             </>
           )}
         </div>
@@ -402,6 +451,7 @@ export const ComposeModal: React.FC = () => {
   const { isOpen, replyTo, close } = useComposeStore();
   const { user } = useAuthStore();
   const { createPost } = useFeedStore();
+  const navigate = useNavigate();
 
   const [content, setContent] = useState('');
   const [activePanel, setActivePanel] = useState<Panel>('none');
@@ -542,7 +592,6 @@ export const ComposeModal: React.FC = () => {
         if (selectedDiscussion.animeId != null) discussionDoc.animeId = selectedDiscussion.animeId;
         if (selectedDiscussion.animeName) discussionDoc.animeName = selectedDiscussion.animeName;
         if (selectedDiscussion.animeCover) discussionDoc.animeCover = selectedDiscussion.animeCover;
-        if (selectedDiscussion.season != null) discussionDoc.season = selectedDiscussion.season;
         if (selectedDiscussion.episode != null) discussionDoc.episode = selectedDiscussion.episode;
 
         await Promise.all([
@@ -551,6 +600,7 @@ export const ComposeModal: React.FC = () => {
             discussionType: selectedDiscussion.type,
             discussionId: selectedDiscussion.discussionId,
             discussionTitle: selectedDiscussion.discussionTitle,
+            ...(selectedDiscussion.animeCover ? { discussionAnimeCover: selectedDiscussion.animeCover } : {}),
           }),
         ]);
       }
@@ -726,7 +776,10 @@ export const ComposeModal: React.FC = () => {
               )}
               {activePanel === 'discussion' && (
                 <motion.div key="discussion" initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} style={{ overflow: 'hidden' }}>
-                  <DiscussionPanel onSelect={handleDiscussionSelect} />
+                  <DiscussionPanel
+                    onSelect={handleDiscussionSelect}
+                    onJoinRoom={(id) => { close(); navigate(`/discussion/${id}`); }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>

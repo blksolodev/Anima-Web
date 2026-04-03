@@ -106,7 +106,32 @@ export interface Post {
   isMature?: boolean;
   mediaAttachment?: MediaAttachment;
   animeReference?: AnimeReference;
+  discussionType?: 'episode' | 'live';
+  discussionId?: string;
+  discussionTitle?: string;
+  discussionAnimeCover?: string;
   parentId?: string;
+}
+
+export interface DiscussionRoom {
+  id: string;
+  type: 'episode' | 'live';
+  title: string;
+  animeId?: number;
+  animeName?: string;
+  animeCover?: string;
+  episode?: number;
+  createdAt: any;
+  createdBy: string;
+  messageCount: number;
+}
+
+export interface DiscussionMessage {
+  id: string;
+  authorId: string;
+  author: PostAuthor;
+  content: string;
+  timestamp: any;
 }
 
 export interface Anime {

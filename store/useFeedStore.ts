@@ -9,6 +9,7 @@ import {
   unlikePost,
   repostPost,
   unrepostPost,
+  deletePost,
   hydrateIsLiked,
   hydrateIsReposted,
   CreatePostOptions,
@@ -30,6 +31,8 @@ interface FeedState {
   createPost: (content: string, author: PostAuthor, options?: CreatePostOptions) => Promise<string>;
   likePost: (postId: string, userId: string) => void;
   repostPost: (postId: string, userId: string, currentUser?: User, post?: Post) => void;
+  deletePost: (postId: string, authorId: string) => Promise<void>;
+  removePost: (postId: string) => void;
 }
 
 export const useFeedStore = create<FeedState>((set, get) => ({
@@ -152,6 +155,15 @@ export const useFeedStore = create<FeedState>((set, get) => ({
         ),
       }));
     });
+  },
+
+  deletePost: async (postId, authorId) => {
+    set((s) => ({ posts: s.posts.filter((p) => p.id !== postId) }));
+    await deletePost(postId, authorId).catch(() => {});
+  },
+
+  removePost: (postId) => {
+    set((s) => ({ posts: s.posts.filter((p) => p.id !== postId) }));
   },
 
   repostPost: (postId, userId, currentUser, postArg) => {

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MessageCircle, Heart, Repeat2, Share2, MoreHorizontal, BookmarkPlus, EyeOff } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, Heart, Repeat2, Share2, MoreHorizontal, EyeOff, Tv2, Radio, Trash2, Flag, XCircle } from 'lucide-react';
+import { reportPost } from '../services/feed.service';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
@@ -32,9 +33,47 @@ const formatTime = (ts: any): string => {
 export const PostCard: React.FC<PostCardProps> = ({ post, showRepliesInline = false }) => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { likePost, repostPost } = useFeedStore();
+  const { likePost, repostPost, deletePost, removePost } = useFeedStore();
   const [showReplies, setShowReplies] = useState(showRepliesInline);
   const [spoilerRevealed, setSpoilerRevealed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showReportMenu, setShowReportMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const isOwner = user?.id === post.author?.id;
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setShowReportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [menuOpen]);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    await deletePost(post.id, post.author.id);
+  };
+
+  const handleNotInterested = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    removePost(post.id);
+  };
+
+  const handleReport = async (e: React.MouseEvent, reason: string) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    setShowReportMenu(false);
+    if (!user) return;
+    await reportPost(post.id, user.id, reason).catch(() => {});
+  };
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -108,9 +147,72 @@ export const PostCard: React.FC<PostCardProps> = ({ post, showRepliesInline = fa
                 {post.isMature && (
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30">18+</span>
                 )}
-                <button onClick={(e) => e.stopPropagation()} className="text-[#6B6B7B] hover:text-white p-1">
-                  <MoreHorizontal size={16} />
-                </button>
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); setShowReportMenu(false); }}
+                    className="text-[#6B6B7B] hover:text-white p-1 rounded-full hover:bg-white/5 transition-colors"
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+
+                  <AnimatePresence>
+                    {menuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                        transition={{ duration: 0.1 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute right-0 top-7 z-50 w-48 bg-[#1A1A2E] border border-white/10 rounded-xl shadow-xl overflow-hidden"
+                      >
+                        {!showReportMenu ? (
+                          <>
+                            <button
+                              onClick={handleNotInterested}
+                              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#A0A0B0] hover:bg-white/5 hover:text-white transition-colors"
+                            >
+                              <XCircle size={15} />
+                              Not Interested
+                            </button>
+                            {!isOwner && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setShowReportMenu(true); }}
+                                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors"
+                              >
+                                <Flag size={15} />
+                                Report Post
+                              </button>
+                            )}
+                            {isOwner && (
+                              <button
+                                onClick={handleDelete}
+                                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors"
+                              >
+                                <Trash2 size={15} />
+                                Delete Post
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p className="px-4 py-2 text-[10px] text-[#6B6B7B] uppercase tracking-wider font-semibold border-b border-white/10">
+                              Report reason
+                            </p>
+                            {['Spam', 'Hate speech', 'Harassment', 'Misinformation', 'Inappropriate content'].map((reason) => (
+                              <button
+                                key={reason}
+                                onClick={(e) => handleReport(e, reason)}
+                                className="flex w-full px-4 py-2.5 text-sm text-[#A0A0B0] hover:bg-white/5 hover:text-white transition-colors"
+                              >
+                                {reason}
+                              </button>
+                            ))}
+                          </>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
 
@@ -144,6 +246,40 @@ export const PostCard: React.FC<PostCardProps> = ({ post, showRepliesInline = fa
                   )}
                 </div>
               </div>
+            )}
+
+            {/* Discussion tag */}
+            {post.discussionTitle && post.discussionId && (
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate(`/discussion/${post.discussionId}`, { state: { discussionTitle: post.discussionTitle } }); }}
+                className={`inline-flex items-center gap-0 mb-3 border rounded-xl overflow-hidden hover:brightness-110 transition-all max-w-full text-left ${
+                  post.discussionType === 'live'
+                    ? 'bg-[#FF6B35]/10 border-[#FF6B35]/25 hover:border-[#FF6B35]/50'
+                    : 'bg-[#06B6D4]/10 border-[#06B6D4]/25 hover:border-[#06B6D4]/50'
+                }`}
+              >
+                {post.discussionAnimeCover && (
+                  <img
+                    src={post.discussionAnimeCover}
+                    alt=""
+                    className="w-8 h-11 object-cover flex-shrink-0"
+                  />
+                )}
+                <div className="px-3 py-2 flex flex-col gap-0.5 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    {post.discussionType === 'live' ? (
+                      <Radio size={12} className="text-[#FF6B35] flex-shrink-0" />
+                    ) : (
+                      <Tv2 size={12} className="text-[#06B6D4] flex-shrink-0" />
+                    )}
+                    <span className={`text-[10px] font-bold uppercase tracking-wide ${post.discussionType === 'live' ? 'text-[#FF6B35]' : 'text-[#06B6D4]'}`}>
+                      {post.discussionType === 'live' ? 'Live Discussion' : 'Episode Discussion'}
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-white truncate">{post.discussionTitle}</span>
+                  <span className="text-[10px] text-[#A0A0B0]">Join the room →</span>
+                </div>
+              </button>
             )}
 
             {/* Media */}
