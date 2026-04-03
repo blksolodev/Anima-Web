@@ -9,7 +9,7 @@ declare global {
 // Replace these with your actual AdSense Publisher ID and Slot IDs from
 // https://adsense.google.com → Ads → By ad unit → Display ads
 const PUBLISHER_ID = 'ca-pub-8858368631096924';
-const FEED_SLOT_ID = 'XXXXXXXXXX'; // "Feed inline" ad unit slot ID
+const FEED_SLOT_ID = '3589536075';
 
 export const AdCard: React.FC = () => {
   const pushed = useRef(false);
@@ -36,7 +36,7 @@ export const AdCard: React.FC = () => {
         data-ad-client={PUBLISHER_ID}
         data-ad-slot={FEED_SLOT_ID}
         data-ad-format="fluid"
-        data-ad-layout="in-article"
+        data-ad-layout-key="-6t+ed+2i-1n-4w"
         data-full-width-responsive="true"
       />
     </div>
