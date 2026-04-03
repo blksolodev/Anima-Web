@@ -44,10 +44,11 @@ export const useFeedStore = create<FeedState>((set, get) => ({
   _unsubscribe: null,
 
   subscribe: (userId: string) => {
-    // Clean up any existing subscription
+    // Clean up any existing subscription and reset posts so isLiked/isReposted
+    // flags are not carried over when switching users (including guest → user).
     get()._unsubscribe?.();
 
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, posts: [], lastDoc: null });
 
     const unsub = subscribeFeed(
       async (rawPosts) => {
