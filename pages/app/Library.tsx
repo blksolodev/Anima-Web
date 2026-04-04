@@ -194,7 +194,7 @@ export const Library: React.FC = () => {
   }, [entries]);
 
   return (
-    <div className="w-full max-w-3xl mx-auto pb-24">
+    <div className="w-full max-w-3xl mx-auto pb-24 overflow-x-hidden">
       {/* Sticky header */}
       <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10 px-4 pt-4 pb-0">
         <div className="flex items-center justify-between mb-3">
@@ -237,24 +237,22 @@ export const Library: React.FC = () => {
       <div className="px-4 pt-4">
         {/* Stats bar */}
         {!loading && entries.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+          <div className="grid grid-cols-4 gap-2 mb-5">
             {[
               { icon: BookOpen,    label: 'Total',     value: stats.total },
               { icon: PlayCircle,  label: 'Watching',  value: stats.watching },
               { icon: Tv,          label: 'Episodes',  value: stats.totalEps },
-              { icon: Star,        label: 'Mean Score',value: stats.meanScore },
+              { icon: Star,        label: 'Score',     value: stats.meanScore },
             ].map(({ icon: Icon, label, value }) => (
               <div
                 key={label}
-                className="bg-[#1A1A2E] border border-white/5 rounded-xl p-3 flex items-center gap-3"
+                className="bg-[#1A1A2E] border border-white/5 rounded-xl p-2.5 flex flex-col items-center gap-1 text-center"
               >
-                <div className="w-8 h-8 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center flex-shrink-0">
-                  <Icon size={16} className="text-[#FF6B35]" />
+                <div className="w-7 h-7 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center">
+                  <Icon size={14} className="text-[#FF6B35]" />
                 </div>
-                <div>
-                  <p className="text-xs text-[#A0A0B0]">{label}</p>
-                  <p className="font-bold text-white text-sm">{value}</p>
-                </div>
+                <p className="text-[10px] text-[#A0A0B0] leading-tight">{label}</p>
+                <p className="font-bold text-white text-sm leading-tight">{value}</p>
               </div>
             ))}
           </div>
@@ -262,7 +260,7 @@ export const Library: React.FC = () => {
 
         {/* Search + Sort */}
         {!loading && entries.length > 0 && (
-          <div className="flex gap-3 mb-5">
+          <div className="flex flex-col sm:flex-row gap-2 mb-5">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B7B]" size={15} />
               <input
@@ -278,7 +276,7 @@ export const Library: React.FC = () => {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
-                className="bg-[#1A1A2E] border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white appearance-none focus:outline-none focus:border-[#FF6B35] transition-colors cursor-pointer"
+                className="w-full sm:w-auto bg-[#1A1A2E] border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white appearance-none focus:outline-none focus:border-[#FF6B35] transition-colors cursor-pointer"
               >
                 <option value="updated">Last Updated</option>
                 <option value="title">Title A–Z</option>
@@ -315,7 +313,7 @@ export const Library: React.FC = () => {
             <p className="text-sm">No anime match your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             <AnimatePresence>
               {displayed.map((entry) => {
                 const total = entry.totalEpisodes || entry.anime?.episodes || 0;
