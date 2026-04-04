@@ -234,25 +234,27 @@ export const Library: React.FC = () => {
         </div>
       </div>
 
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-4 w-full overflow-x-hidden">
         {/* Stats bar */}
         {!loading && entries.length > 0 && (
-          <div className="grid grid-cols-4 gap-2 mb-5">
+          <div className="grid grid-cols-2 gap-2 mb-5">
             {[
-              { icon: BookOpen,    label: 'Total',     value: stats.total },
-              { icon: PlayCircle,  label: 'Watching',  value: stats.watching },
-              { icon: Tv,          label: 'Episodes',  value: stats.totalEps },
-              { icon: Star,        label: 'Score',     value: stats.meanScore },
+              { icon: BookOpen,    label: 'Total',      value: stats.total },
+              { icon: PlayCircle,  label: 'Watching',   value: stats.watching },
+              { icon: Tv,          label: 'Episodes',   value: stats.totalEps },
+              { icon: Star,        label: 'Mean Score', value: stats.meanScore },
             ].map(({ icon: Icon, label, value }) => (
               <div
                 key={label}
-                className="bg-[#1A1A2E] border border-white/5 rounded-xl p-2.5 flex flex-col items-center gap-1 text-center"
+                className="bg-[#1A1A2E] border border-white/5 rounded-xl p-3 flex items-center gap-3"
               >
-                <div className="w-7 h-7 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center">
-                  <Icon size={14} className="text-[#FF6B35]" />
+                <div className="w-8 h-8 rounded-lg bg-[#FF6B35]/10 flex items-center justify-center flex-shrink-0">
+                  <Icon size={15} className="text-[#FF6B35]" />
                 </div>
-                <p className="text-[10px] text-[#A0A0B0] leading-tight">{label}</p>
-                <p className="font-bold text-white text-sm leading-tight">{value}</p>
+                <div>
+                  <p className="text-[11px] text-[#A0A0B0]">{label}</p>
+                  <p className="font-bold text-white text-sm">{value}</p>
+                </div>
               </div>
             ))}
           </div>
