@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Loader2, Tv, Search, SortAsc, BookOpen, Star, PlayCircle } from 'lucide-react';
+import { Plus, Loader2, Tv, Search, SortAsc, BookOpen, Star, PlayCircle, Pencil } from 'lucide-react';
 import { fetchAniList, GET_ANIME_BY_IDS } from '../../lib/anilist';
 import { LibraryEntry } from '../../types';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -360,8 +360,8 @@ export const Library: React.FC = () => {
                         {statusLabel}
                       </div>
 
-                      {/* Hover overlay — Update button */}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      {/* Desktop hover overlay */}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex items-center justify-center">
                         <button
                           onClick={(e) => { e.stopPropagation(); setSelectedEntry(entry); }}
                           className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full font-bold text-sm border border-white/20 hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all"
@@ -369,6 +369,14 @@ export const Library: React.FC = () => {
                           Update
                         </button>
                       </div>
+
+                      {/* Mobile always-visible update tap target */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedEntry(entry); }}
+                        className="sm:hidden absolute bottom-2 right-2 w-8 h-8 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white active:bg-[#FF6B35] transition-colors"
+                      >
+                        <Pencil size={13} />
+                      </button>
                     </div>
 
                     {/* Title */}
