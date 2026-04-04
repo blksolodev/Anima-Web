@@ -42,7 +42,7 @@ export const AppLayout: React.FC = () => {
       <AppSidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-64 min-h-screen border-r border-white/10 relative">
+      <main className="flex-1 min-w-0 lg:ml-64 min-h-screen border-r border-white/10 relative overflow-x-hidden">
         <Outlet />
       </main>
 
