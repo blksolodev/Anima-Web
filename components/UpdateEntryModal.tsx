@@ -44,8 +44,9 @@ export const UpdateEntryModal: React.FC<UpdateEntryModalProps> = ({ entry, onClo
         sc: score,
         status: status,
         s: status,
+        watchStatus: status, // legacy field used by some entries — keep in sync
         updatedAt: serverTimestamp(),
-        u: serverTimestamp() // Phone app uses 'u' for updatedAt timestamp number, but serverTimestamp works
+        u: serverTimestamp(),
       };
 
       // Auto-complete logic
