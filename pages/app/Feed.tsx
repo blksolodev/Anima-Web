@@ -14,7 +14,9 @@ export const Feed: React.FC = () => {
   const { posts, loading, error, subscribe, unsubscribe } = useFeedStore();
   const { open: openCompose } = useComposeStore();
   const [tab, setTab] = useState<FeedTab>('foryou');
+  const [headerVisible, setHeaderVisible] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const lastScrollY = useRef(0);
 
   // Subscribe to real-time feed — works for guests too (no like/repost hydration)
   useEffect(() => {
@@ -22,8 +24,18 @@ export const Feed: React.FC = () => {
     return () => unsubscribe();
   }, [user?.id, subscribe, unsubscribe]);
 
-  // Infinite scroll — load more when bottom sentinel enters view
+  // Infinite scroll + header hide/show on mobile
   const handleScroll = useCallback(() => {
+    const y = window.scrollY;
+
+    // Hide header after 60px scrolled down, show when scrolling back up
+    if (y > 60) {
+      setHeaderVisible(y < lastScrollY.current);
+    } else {
+      setHeaderVisible(true);
+    }
+    lastScrollY.current = y;
+
     const { loadMore, hasMore, loading } = useFeedStore.getState();
     if (!bottomRef.current || !hasMore || loading) return;
     const rect = bottomRef.current.getBoundingClientRect();
@@ -37,8 +49,12 @@ export const Feed: React.FC = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Sticky header */}
-      <div className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10">
+      {/* Sticky header — hides on mobile when scrolled past 60px */}
+      <motion.div
+        className="sticky top-0 z-30 bg-[#0D0D14] sm:bg-[#0D0D14]/90 backdrop-blur-xl border-b border-white/10"
+        animate={{ y: headerVisible ? 0 : '-100%', opacity: headerVisible ? 1 : 0 }}
+        transition={{ duration: 0.2, ease: 'easeInOut' }}
+      >
         <div className="flex items-center justify-between px-4 pt-4 pb-0">
           <h1 className="text-xl font-bold">Home</h1>
           <button
@@ -68,7 +84,7 @@ export const Feed: React.FC = () => {
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Inline quick-compose strip */}
       <button
