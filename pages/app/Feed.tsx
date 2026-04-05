@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, RefreshCw, AlertCircle, Tv, Zap, PenSquare } from 'lucide-react';
 import { PostCard } from '../../components/PostCard';
@@ -6,8 +6,9 @@ import { AdCard } from '../../components/AdCard';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useFeedStore } from '../../store/useFeedStore';
 import { useComposeStore } from '../../store/useComposeStore';
+import { getFollowingIds } from '../../services/user.service';
 
-type FeedTab = 'foryou' | 'following';
+type FeedTab = 'foryou' | 'following' | 'trending' | 'new';
 
 export const Feed: React.FC = () => {
   const { user } = useAuthStore();
@@ -15,8 +16,32 @@ export const Feed: React.FC = () => {
   const { open: openCompose } = useComposeStore();
   const [tab, setTab] = useState<FeedTab>('foryou');
   const [headerVisible, setHeaderVisible] = useState(true);
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
+
+  // Fetch following IDs once when user is available
+  useEffect(() => {
+    if (!user?.id) return;
+    getFollowingIds(user.id).then((ids) => setFollowingIds(new Set(ids)));
+  }, [user?.id]);
+
+  const visiblePosts = useMemo(() => {
+    if (tab === 'following') {
+      return posts.filter((p) => followingIds.has(p.authorId));
+    }
+    if (tab === 'trending') {
+      return [...posts].sort((a, b) => (b.likes + b.reposts + b.replies) - (a.likes + a.reposts + a.replies));
+    }
+    if (tab === 'new') {
+      return [...posts].sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() ?? new Date(a.createdAt).getTime();
+        const bTime = b.createdAt?.toMillis?.() ?? new Date(b.createdAt).getTime();
+        return bTime - aTime;
+      });
+    }
+    return posts; // foryou — default feed order
+  }, [tab, posts, followingIds]);
 
   // Subscribe to real-time feed — works for guests too (no like/repost hydration)
   useEffect(() => {
@@ -67,14 +92,19 @@ export const Feed: React.FC = () => {
 
         {/* Tabs */}
         <div className="flex mt-1">
-          {(['foryou', 'following'] as FeedTab[]).map((t) => (
+          {([
+            ['foryou', 'For You'],
+            ['following', 'Following'],
+            ['trending', 'Trending'],
+            ['new', 'New'],
+          ] as [FeedTab, string][]).map(([t, label]) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`flex-1 py-3 text-sm font-medium relative transition-colors
                 ${tab === t ? 'text-white' : 'text-[#A0A0B0] hover:text-white'}`}
             >
-              {t === 'foryou' ? 'For You' : 'Following'}
+              {label}
               {tab === t && (
                 <motion.div
                   layoutId="feed-tab-indicator"
@@ -118,11 +148,21 @@ export const Feed: React.FC = () => {
             <RefreshCw size={14} /> Retry
           </button>
         </div>
-      ) : posts.length === 0 ? (
+      ) : visiblePosts.length === 0 && tab === 'following' && !loading ? (
+        <div className="flex flex-col items-center py-20 px-6 text-center">
+          <div className="w-16 h-16 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-4">
+            <Tv className="text-[#FF6B35]" size={28} />
+          </div>
+          <h3 className="text-lg font-bold mb-1">No posts from people you follow</h3>
+          <p className="text-[#A0A0B0] text-sm max-w-xs">
+            Follow other anime fans to see their posts here.
+          </p>
+        </div>
+      ) : visiblePosts.length === 0 ? (
         <EmptyFeed onCompose={() => openCompose()} />
       ) : (
         <AnimatePresence initial={false}>
-          {posts.map((post, index) => (
+          {visiblePosts.map((post, index) => (
             <React.Fragment key={post.id}>
               <PostCard post={post} />
               {!user?.isPlus && (index + 1) % 5 === 0 && (
