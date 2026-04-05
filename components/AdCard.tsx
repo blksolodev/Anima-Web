@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 declare global {
   interface Window {
@@ -13,6 +13,8 @@ const FEED_SLOT_ID = '3589536075';
 
 export const AdCard: React.FC = () => {
   const pushed = useRef(false);
+  const insRef = useRef<HTMLModElement>(null);
+  const [filled, setFilled] = useState(true);
 
   useEffect(() => {
     // Guard against React StrictMode double-invoke and hot-reload re-runs
@@ -23,7 +25,22 @@ export const AdCard: React.FC = () => {
     } catch {
       // AdSense script hasn't loaded yet — safe to ignore
     }
+
+    // Watch for AdSense setting data-ad-status on the <ins> element
+    const el = insRef.current;
+    if (!el) return;
+
+    const observer = new MutationObserver(() => {
+      if (el.getAttribute('data-ad-status') === 'unfilled') {
+        setFilled(false);
+      }
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
+
+    return () => observer.disconnect();
   }, []);
+
+  if (!filled) return null;
 
   return (
     <div className="border-b border-white/10 px-4 py-3 overflow-hidden">
@@ -31,6 +48,7 @@ export const AdCard: React.FC = () => {
         Sponsored
       </span>
       <ins
+        ref={insRef}
         className="adsbygoogle"
         style={{ display: 'block' }}
         data-ad-client={PUBLISHER_ID}
